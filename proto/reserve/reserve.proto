@@ -1,0 +1,21 @@
+syntax = "proto3";
+option go_package = "github.com/KKhimmoon/yuemnoi-reserve";
+
+message Item {
+    uint64 id = 1;           
+    string name = 2;     
+}
+// The item service definition.
+service ItemService {
+    rpc CreateItem(CreateItemRequest) returns (CreateItemResponse);
+}
+
+// The request message containing the item's details.
+message CreateItemRequest {
+    string name = 1;
+}
+
+// The response message containing the result of the creation.
+message CreateItemResponse {
+    string message = 1;
+}
