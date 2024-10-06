@@ -2,16 +2,17 @@ package db
 
 import (
 	"fmt"
-	"github.com/KKhimmoon/yuemnoi-reserve/config"
-	"github.com/KKhimmoon/yuemnoi-reserve/internal/model"
-	"github.com/KKhimmoon/yuemnoi-reserve/internal/repository"
-	"github.com/KKhimmoon/yuemnoi-reserve/internal/handler"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"log"
 	"net"
-	"google.golang.org/grpc"
+
+	"github.com/KKhimmoon/yuemnoi-reserve/config"
+	"github.com/KKhimmoon/yuemnoi-reserve/internal/handler"
+	"github.com/KKhimmoon/yuemnoi-reserve/internal/model"
+	"github.com/KKhimmoon/yuemnoi-reserve/internal/repository"
 	pb "github.com/KKhimmoon/yuemnoi-reserve/proto/reserve"
+	"google.golang.org/grpc"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func InitPostgreSQL(cfg *config.Config) *gorm.DB {
@@ -27,6 +28,9 @@ func InitPostgreSQL(cfg *config.Config) *gorm.DB {
 
 func Migration(db *gorm.DB) {
 	if err := db.AutoMigrate(&model.Item{}); err != nil {
+		log.Fatalf("failed to migrate database: %v", err)
+	}
+	if err := db.AutoMigrate(&model.Request{}); err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
 }
@@ -45,12 +49,15 @@ func ServerInit(cfg *config.Config, db *gorm.DB) error {
 
 	//repository
 	itemRepository := repository.NewItemRepository(db)
+	lendingRequestRepo := repository.NewLendingRequestRepository(db)
 
 	//gRPC handler
 	itemServer := handler.NewItemGRPC(itemRepository)
+	lendingRequestServer := handler.NewLendingRequestGRPC(lendingRequestRepo)
 
 	// Register service with the gRPC server
 	pb.RegisterItemServiceServer(grpcServer, itemServer)
+	pb.RegisterReserveServiceServer(grpcServer, lendingRequestServer)
 
 	err = grpcServer.Serve(listen)
 	if err != nil {
