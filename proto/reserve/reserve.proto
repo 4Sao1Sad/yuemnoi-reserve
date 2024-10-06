@@ -1,4 +1,5 @@
 syntax = "proto3";
+import "google/protobuf/timestamp.proto";
 option go_package = "github.com/KKhimmoon/yuemnoi-reserve";
 
 
@@ -50,4 +51,47 @@ service BorrowingService {
     rpc ConfirmBorrowingRequest(ConfirmBorrowingRequestInput ) returns (BorrowingRequest);
     rpc RejectBorrowingRequest(RejectBorrowingRequestInput ) returns (BorrowingRequest);
     rpc ReturnItemRequest(ReturnItemRequestInput) returns (BorrowingRequest);
+}
+
+// The reserve message representing the structure of the Reserve object
+message Request {
+    uint64 id = 1;           
+    string request_user_id = 2;
+    string response_user_id = 3;
+    string post_id = 4;   
+    RequestStatus status = 5;
+    google.protobuf.Timestamp updated_at = 6;  
+}
+
+// Request message for creating a new Reserve
+message CreateLendingRequestRequest {
+    string request_user_id = 1;
+    string response_user_id = 2;
+    string post_id = 3;
+}
+
+// Response message for the CreateReserve service
+message CreateLendingRequestResponse {
+    uint64 id = 1;            
+    string message = 2;       
+}
+
+// Request message for fetching Reserve details
+message GetLendingRequestDetailRequest {
+    uint64 id = 1;
+}
+
+message RejectLendingRequestRequest {
+    uint64 id = 1;
+}
+
+message AcceptLendingRequestRequest {
+    uint64 id = 1;
+}
+
+service ReserveService {
+    rpc CreateLendingRequest(CreateLendingRequestRequest) returns (CreateLendingRequestResponse) {}
+    rpc GetLendingRequestDetail(GetLendingRequestDetailRequest) returns (Request) {}
+    rpc RejectLendingRequest(RejectLendingRequestRequest) returns (Request) {}
+    rpc AcceptLendingRequest(AcceptLendingRequestRequest) returns (Request) {}
 }
