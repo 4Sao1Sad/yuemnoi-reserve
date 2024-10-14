@@ -10,17 +10,18 @@ type LendingRequestRepositoryImpl struct {
 }
 
 type LendingRequestRepository interface {
-	CreateLendingRequest(request model.Request) (*model.Request, error)
-	GetLendingRequestById(id uint64) (*model.Request, error)
-	RejectLendingRequest(id uint64) (*model.Request, error)
-	AcceptLendingRequest(id uint64) (*model.Request, error)
+	CreateLendingRequest(request model.LendingRequest) (*model.LendingRequest, error)
+	GetLendingRequestById(id uint64) (*model.LendingRequest, error)
+	RejectLendingRequest(id uint64) (*model.LendingRequest, error)
+	AcceptLendingRequest(id uint64) (*model.LendingRequest, error)
+	ReturnItem(id uint64) (*model.LendingRequest, error)
 }
 
 func NewLendingRequestRepository(db *gorm.DB) LendingRequestRepository {
 	return &LendingRequestRepositoryImpl{db}
 }
 
-func (r LendingRequestRepositoryImpl) CreateLendingRequest(request model.Request) (*model.Request, error) {
+func (r LendingRequestRepositoryImpl) CreateLendingRequest(request model.LendingRequest) (*model.LendingRequest, error) {
 	err := r.db.Create(&request).Error
 	if err != nil {
 		return nil, err
@@ -28,8 +29,8 @@ func (r LendingRequestRepositoryImpl) CreateLendingRequest(request model.Request
 	return &request, nil
 }
 
-func (r LendingRequestRepositoryImpl) GetLendingRequestById(id uint64) (*model.Request, error) {
-	var request model.Request
+func (r LendingRequestRepositoryImpl) GetLendingRequestById(id uint64) (*model.LendingRequest, error) {
+	var request model.LendingRequest
 	err := r.db.First(&request, id).Error
 	if err != nil {
 		return nil, err
@@ -37,8 +38,8 @@ func (r LendingRequestRepositoryImpl) GetLendingRequestById(id uint64) (*model.R
 	return &request, nil
 }
 
-func (r LendingRequestRepositoryImpl) RejectLendingRequest(id uint64) (*model.Request, error) {
-	var request model.Request
+func (r LendingRequestRepositoryImpl) RejectLendingRequest(id uint64) (*model.LendingRequest, error) {
+	var request model.LendingRequest
 	err := r.db.First(&request, id).Error
 	if err != nil {
 		return nil, err
@@ -51,13 +52,28 @@ func (r LendingRequestRepositoryImpl) RejectLendingRequest(id uint64) (*model.Re
 	return &request, nil
 }
 
-func (r LendingRequestRepositoryImpl) AcceptLendingRequest(id uint64) (*model.Request, error) {
-	var request model.Request
+func (r LendingRequestRepositoryImpl) AcceptLendingRequest(id uint64) (*model.LendingRequest, error) {
+	var request model.LendingRequest
 	err := r.db.First(&request, id).Error
 	if err != nil {
 		return nil, err
 	}
 	request.Status = model.Accept
+	err = r.db.Save(&request).Error
+	if err != nil {
+		return nil, err
+	}
+	return &request, nil
+}
+
+func (r LendingRequestRepositoryImpl) ReturnItem(id uint64) (*model.LendingRequest, error) {
+	var request model.LendingRequest
+	err := r.db.First(&request, id).Error
+	if err != nil {
+		return nil, err
+	}
+	request.Status = model.Accept
+	request.ActiveStatus = false
 	err = r.db.Save(&request).Error
 	if err != nil {
 		return nil, err
