@@ -1,5 +1,4 @@
 syntax = "proto3";
-import "google/protobuf/timestamp.proto";
 option go_package = "github.com/KKhimmoon/yuemnoi-reserve";
 
 
@@ -54,19 +53,24 @@ service BorrowingService {
 }
 
 // The reserve message representing the structure of the Reserve object
-message Request {
+message LendingRequest {
     uint64 id = 1;           
-    string request_user_id = 2;
-    string response_user_id = 3;
+    string lending_user_id = 2;
+    string borrowing_user_id = 3;
     string post_id = 4;   
+<<<<<<< HEAD
     RequestStatus status = 5;
     google.protobuf.Timestamp updated_at = 6;  
+=======
+    LendingRequestStatus status = 5;
+    bool activeStatus = 6;
+>>>>>>> 523ebd4 (feat: add return item and fix request name)
 }
 
 // Request message for creating a new Reserve
 message CreateLendingRequestRequest {
-    string request_user_id = 1;
-    string response_user_id = 2;
+    string lending_user_id = 1;
+    string borrowing_user_id = 2;
     string post_id = 3;
 }
 
@@ -89,9 +93,14 @@ message AcceptLendingRequestRequest {
     uint64 id = 1;
 }
 
+message ReturnItemRequest {
+    uint64 id = 1;
+}
+
 service ReserveService {
     rpc CreateLendingRequest(CreateLendingRequestRequest) returns (CreateLendingRequestResponse) {}
-    rpc GetLendingRequestDetail(GetLendingRequestDetailRequest) returns (Request) {}
-    rpc RejectLendingRequest(RejectLendingRequestRequest) returns (Request) {}
-    rpc AcceptLendingRequest(AcceptLendingRequestRequest) returns (Request) {}
+    rpc GetLendingRequestDetail(GetLendingRequestDetailRequest) returns (LendingRequest) {}
+    rpc RejectLendingRequest(RejectLendingRequestRequest) returns (LendingRequest) {}
+    rpc AcceptLendingRequest(AcceptLendingRequestRequest) returns (LendingRequest) {}
+    rpc ReturnItem(ReturnItemRequest) returns (LendingRequest) {}
 }
