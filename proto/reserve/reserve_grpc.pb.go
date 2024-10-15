@@ -19,105 +19,253 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ItemService_CreateItem_FullMethodName = "/ItemService/CreateItem"
+	BorrowingService_CreateRequestFromBorrowingPost_FullMethodName = "/BorrowingService/CreateRequestFromBorrowingPost"
+	BorrowingService_GetBorrowingRequestById_FullMethodName        = "/BorrowingService/GetBorrowingRequestById"
+	BorrowingService_ConfirmBorrowingRequest_FullMethodName        = "/BorrowingService/ConfirmBorrowingRequest"
+	BorrowingService_RejectBorrowingRequest_FullMethodName         = "/BorrowingService/RejectBorrowingRequest"
+	BorrowingService_ReturnItemRequest_FullMethodName              = "/BorrowingService/ReturnItemRequest"
 )
 
-// ItemServiceClient is the client API for ItemService service.
+// BorrowingServiceClient is the client API for BorrowingService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// The item service definition.
-type ItemServiceClient interface {
-	CreateItem(ctx context.Context, in *CreateItemRequest, opts ...grpc.CallOption) (*CreateItemResponse, error)
+type BorrowingServiceClient interface {
+	CreateRequestFromBorrowingPost(ctx context.Context, in *CreateRequestFromBorrowingPostInput, opts ...grpc.CallOption) (*CreateRequestFromBorrowingPostResponse, error)
+	GetBorrowingRequestById(ctx context.Context, in *GetBorrowingRequestInput, opts ...grpc.CallOption) (*BorrowingRequest, error)
+	ConfirmBorrowingRequest(ctx context.Context, in *ConfirmBorrowingRequestInput, opts ...grpc.CallOption) (*BorrowingRequest, error)
+	RejectBorrowingRequest(ctx context.Context, in *RejectBorrowingRequestInput, opts ...grpc.CallOption) (*BorrowingRequest, error)
+	ReturnItemRequest(ctx context.Context, in *ReturnItemRequestInput, opts ...grpc.CallOption) (*BorrowingRequest, error)
 }
 
-type itemServiceClient struct {
+type borrowingServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewItemServiceClient(cc grpc.ClientConnInterface) ItemServiceClient {
-	return &itemServiceClient{cc}
+func NewBorrowingServiceClient(cc grpc.ClientConnInterface) BorrowingServiceClient {
+	return &borrowingServiceClient{cc}
 }
 
-func (c *itemServiceClient) CreateItem(ctx context.Context, in *CreateItemRequest, opts ...grpc.CallOption) (*CreateItemResponse, error) {
+func (c *borrowingServiceClient) CreateRequestFromBorrowingPost(ctx context.Context, in *CreateRequestFromBorrowingPostInput, opts ...grpc.CallOption) (*CreateRequestFromBorrowingPostResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateItemResponse)
-	err := c.cc.Invoke(ctx, ItemService_CreateItem_FullMethodName, in, out, cOpts...)
+	out := new(CreateRequestFromBorrowingPostResponse)
+	err := c.cc.Invoke(ctx, BorrowingService_CreateRequestFromBorrowingPost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ItemServiceServer is the server API for ItemService service.
-// All implementations must embed UnimplementedItemServiceServer
-// for forward compatibility.
-//
-// The item service definition.
-type ItemServiceServer interface {
-	CreateItem(context.Context, *CreateItemRequest) (*CreateItemResponse, error)
-	mustEmbedUnimplementedItemServiceServer()
+func (c *borrowingServiceClient) GetBorrowingRequestById(ctx context.Context, in *GetBorrowingRequestInput, opts ...grpc.CallOption) (*BorrowingRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BorrowingRequest)
+	err := c.cc.Invoke(ctx, BorrowingService_GetBorrowingRequestById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-// UnimplementedItemServiceServer must be embedded to have
+func (c *borrowingServiceClient) ConfirmBorrowingRequest(ctx context.Context, in *ConfirmBorrowingRequestInput, opts ...grpc.CallOption) (*BorrowingRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BorrowingRequest)
+	err := c.cc.Invoke(ctx, BorrowingService_ConfirmBorrowingRequest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *borrowingServiceClient) RejectBorrowingRequest(ctx context.Context, in *RejectBorrowingRequestInput, opts ...grpc.CallOption) (*BorrowingRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BorrowingRequest)
+	err := c.cc.Invoke(ctx, BorrowingService_RejectBorrowingRequest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *borrowingServiceClient) ReturnItemRequest(ctx context.Context, in *ReturnItemRequestInput, opts ...grpc.CallOption) (*BorrowingRequest, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BorrowingRequest)
+	err := c.cc.Invoke(ctx, BorrowingService_ReturnItemRequest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// BorrowingServiceServer is the server API for BorrowingService service.
+// All implementations must embed UnimplementedBorrowingServiceServer
+// for forward compatibility.
+type BorrowingServiceServer interface {
+	CreateRequestFromBorrowingPost(context.Context, *CreateRequestFromBorrowingPostInput) (*CreateRequestFromBorrowingPostResponse, error)
+	GetBorrowingRequestById(context.Context, *GetBorrowingRequestInput) (*BorrowingRequest, error)
+	ConfirmBorrowingRequest(context.Context, *ConfirmBorrowingRequestInput) (*BorrowingRequest, error)
+	RejectBorrowingRequest(context.Context, *RejectBorrowingRequestInput) (*BorrowingRequest, error)
+	ReturnItemRequest(context.Context, *ReturnItemRequestInput) (*BorrowingRequest, error)
+	mustEmbedUnimplementedBorrowingServiceServer()
+}
+
+// UnimplementedBorrowingServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedItemServiceServer struct{}
+type UnimplementedBorrowingServiceServer struct{}
 
-func (UnimplementedItemServiceServer) CreateItem(context.Context, *CreateItemRequest) (*CreateItemResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateItem not implemented")
+func (UnimplementedBorrowingServiceServer) CreateRequestFromBorrowingPost(context.Context, *CreateRequestFromBorrowingPostInput) (*CreateRequestFromBorrowingPostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRequestFromBorrowingPost not implemented")
 }
-func (UnimplementedItemServiceServer) mustEmbedUnimplementedItemServiceServer() {}
-func (UnimplementedItemServiceServer) testEmbeddedByValue()                     {}
+func (UnimplementedBorrowingServiceServer) GetBorrowingRequestById(context.Context, *GetBorrowingRequestInput) (*BorrowingRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBorrowingRequestById not implemented")
+}
+func (UnimplementedBorrowingServiceServer) ConfirmBorrowingRequest(context.Context, *ConfirmBorrowingRequestInput) (*BorrowingRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfirmBorrowingRequest not implemented")
+}
+func (UnimplementedBorrowingServiceServer) RejectBorrowingRequest(context.Context, *RejectBorrowingRequestInput) (*BorrowingRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RejectBorrowingRequest not implemented")
+}
+func (UnimplementedBorrowingServiceServer) ReturnItemRequest(context.Context, *ReturnItemRequestInput) (*BorrowingRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReturnItemRequest not implemented")
+}
+func (UnimplementedBorrowingServiceServer) mustEmbedUnimplementedBorrowingServiceServer() {}
+func (UnimplementedBorrowingServiceServer) testEmbeddedByValue()                          {}
 
-// UnsafeItemServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ItemServiceServer will
+// UnsafeBorrowingServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to BorrowingServiceServer will
 // result in compilation errors.
-type UnsafeItemServiceServer interface {
-	mustEmbedUnimplementedItemServiceServer()
+type UnsafeBorrowingServiceServer interface {
+	mustEmbedUnimplementedBorrowingServiceServer()
 }
 
-func RegisterItemServiceServer(s grpc.ServiceRegistrar, srv ItemServiceServer) {
-	// If the following call pancis, it indicates UnimplementedItemServiceServer was
+func RegisterBorrowingServiceServer(s grpc.ServiceRegistrar, srv BorrowingServiceServer) {
+	// If the following call pancis, it indicates UnimplementedBorrowingServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&ItemService_ServiceDesc, srv)
+	s.RegisterService(&BorrowingService_ServiceDesc, srv)
 }
 
-func _ItemService_CreateItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateItemRequest)
+func _BorrowingService_CreateRequestFromBorrowingPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRequestFromBorrowingPostInput)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ItemServiceServer).CreateItem(ctx, in)
+		return srv.(BorrowingServiceServer).CreateRequestFromBorrowingPost(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ItemService_CreateItem_FullMethodName,
+		FullMethod: BorrowingService_CreateRequestFromBorrowingPost_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ItemServiceServer).CreateItem(ctx, req.(*CreateItemRequest))
+		return srv.(BorrowingServiceServer).CreateRequestFromBorrowingPost(ctx, req.(*CreateRequestFromBorrowingPostInput))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ItemService_ServiceDesc is the grpc.ServiceDesc for ItemService service.
+func _BorrowingService_GetBorrowingRequestById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBorrowingRequestInput)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BorrowingServiceServer).GetBorrowingRequestById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BorrowingService_GetBorrowingRequestById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BorrowingServiceServer).GetBorrowingRequestById(ctx, req.(*GetBorrowingRequestInput))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BorrowingService_ConfirmBorrowingRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfirmBorrowingRequestInput)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BorrowingServiceServer).ConfirmBorrowingRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BorrowingService_ConfirmBorrowingRequest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BorrowingServiceServer).ConfirmBorrowingRequest(ctx, req.(*ConfirmBorrowingRequestInput))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BorrowingService_RejectBorrowingRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RejectBorrowingRequestInput)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BorrowingServiceServer).RejectBorrowingRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BorrowingService_RejectBorrowingRequest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BorrowingServiceServer).RejectBorrowingRequest(ctx, req.(*RejectBorrowingRequestInput))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BorrowingService_ReturnItemRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReturnItemRequestInput)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BorrowingServiceServer).ReturnItemRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BorrowingService_ReturnItemRequest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BorrowingServiceServer).ReturnItemRequest(ctx, req.(*ReturnItemRequestInput))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// BorrowingService_ServiceDesc is the grpc.ServiceDesc for BorrowingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ItemService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ItemService",
-	HandlerType: (*ItemServiceServer)(nil),
+var BorrowingService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "BorrowingService",
+	HandlerType: (*BorrowingServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateItem",
-			Handler:    _ItemService_CreateItem_Handler,
+			MethodName: "CreateRequestFromBorrowingPost",
+			Handler:    _BorrowingService_CreateRequestFromBorrowingPost_Handler,
+		},
+		{
+			MethodName: "GetBorrowingRequestById",
+			Handler:    _BorrowingService_GetBorrowingRequestById_Handler,
+		},
+		{
+			MethodName: "ConfirmBorrowingRequest",
+			Handler:    _BorrowingService_ConfirmBorrowingRequest_Handler,
+		},
+		{
+			MethodName: "RejectBorrowingRequest",
+			Handler:    _BorrowingService_RejectBorrowingRequest_Handler,
+		},
+		{
+			MethodName: "ReturnItemRequest",
+			Handler:    _BorrowingService_ReturnItemRequest_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
