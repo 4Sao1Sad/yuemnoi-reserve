@@ -27,4 +27,4 @@ clean:
 	find $(PROTO_DIR) -name '*.pb.go' -delete
 
 dev: 
-	go run cmd/main.go
+	goreload --build=cmd/
