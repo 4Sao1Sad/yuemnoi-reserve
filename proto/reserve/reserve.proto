@@ -1,21 +1,53 @@
 syntax = "proto3";
 option go_package = "github.com/KKhimmoon/yuemnoi-reserve";
 
-message Item {
-    uint64 id = 1;           
-    string name = 2;     
-}
-// The item service definition.
-service ItemService {
-    rpc CreateItem(CreateItemRequest) returns (CreateItemResponse);
+
+enum RequestStatus {
+    REJECTED = 0;
+    PENDING = 1;
+    ACCEPTED = 2;
 }
 
-// The request message containing the item's details.
-message CreateItemRequest {
-    string name = 1;
+message BorrowingRequest {
+    uint64 id = 1;
+    uint64 lending_user_id = 2;
+    uint64 borrowing_user_id = 3;
+    uint64 lending_post_id = 4;
+    uint64 borrowing_post_id = 5;
+    RequestStatus status = 6;
+    bool active_status = 7;
+}
+message CreateRequestFromBorrowingPostInput{
+    uint64 lending_user_id = 1;
+    uint64 borrowing_user_id = 2;
+    uint64 lending_post_id = 3; 
+    uint64 borrowing_post_id = 4;
 }
 
-// The response message containing the result of the creation.
-message CreateItemResponse {
-    string message = 1;
+message CreateRequestFromBorrowingPostResponse {
+    string message = 1; 
+}
+
+message GetBorrowingRequestInput {
+    uint64 id = 1;
+}
+
+message ConfirmBorrowingRequestInput {
+    uint64 id = 1;
+}
+
+message RejectBorrowingRequestInput  {
+    uint64 id = 1;
+}
+
+message ReturnItemRequestInput {
+    uint64 id = 1;
+}
+
+service BorrowingService {
+    rpc CreateRequestFromBorrowingPost(CreateRequestFromBorrowingPostInput) returns (CreateRequestFromBorrowingPostResponse);
+    rpc GetBorrowingRequestById(GetBorrowingRequestInput) returns (BorrowingRequest);
+    rpc ConfirmBorrowingRequest(ConfirmBorrowingRequestInput ) returns (BorrowingRequest);
+    rpc RejectBorrowingRequest(RejectBorrowingRequestInput ) returns (BorrowingRequest);
+    rpc ReturnItemRequest(ReturnItemRequestInput) returns (BorrowingRequest);
 }
