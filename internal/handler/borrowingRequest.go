@@ -24,10 +24,10 @@ func NewBorrowingGRPC(repo repository.BorrowingRepository) *BorrowingGRPC {
 
 func (h *BorrowingGRPC) CreateRequestFromBorrowingPost(ctx context.Context, input *pb.CreateRequestFromBorrowingPostInput) (*pb.CreateRequestFromBorrowingPostResponse, error) {
 	data := model.BorrowingRequest{
-		LendingUserID:   input.LendingUserId,
-		BorrowingUserID: input.BorrowingUserId,
-		LendingPostID:   input.LendingPostId,
-		BorrowingPostID: input.BorrowingPostId,
+		LendingUserID:   uint(input.LendingUserId),
+		BorrowingUserID: uint(input.BorrowingUserId),
+		LendingPostID:   uint(input.LendingPostId),
+		BorrowingPostID: uint(input.BorrowingPostId),
 		Status:          model.Pending,
 		ActiveStatus:    true,
 	}
@@ -49,10 +49,10 @@ func (h *BorrowingGRPC) GetBorrowingRequestById(ctx context.Context, input *pb.G
 	}
 	response := pb.BorrowingRequest{
 		Id:              uint64(res.ID),
-		LendingUserId:   res.LendingUserID,
-		BorrowingUserId: res.BorrowingUserID,
-		LendingPostId:   res.LendingPostID,
-		BorrowingPostId: res.BorrowingPostID,
+		LendingUserId:   uint64(res.LendingUserID),
+		BorrowingUserId: uint64(res.BorrowingUserID),
+		LendingPostId:   uint64(res.LendingPostID),
+		BorrowingPostId: uint64(res.BorrowingPostID),
 		Status:          util.MapModelToProtoStatus(res.Status),
 		ActiveStatus:    res.ActiveStatus,
 	}
@@ -72,10 +72,10 @@ func (h *BorrowingGRPC) ConfirmBorrowingRequest(ctx context.Context, input *pb.C
 	}
 	response := pb.BorrowingRequest{
 		Id:              uint64(res.ID),
-		LendingUserId:   res.LendingUserID,
-		BorrowingUserId: res.BorrowingUserID,
-		LendingPostId:   res.LendingPostID,
-		BorrowingPostId: res.BorrowingPostID,
+		LendingUserId:   uint64(res.LendingUserID),
+		BorrowingUserId: uint64(res.BorrowingUserID),
+		LendingPostId:   uint64(res.LendingPostID),
+		BorrowingPostId: uint64(res.BorrowingPostID),
 		Status:          util.MapModelToProtoStatus(res.Status),
 		ActiveStatus:    res.ActiveStatus,
 	}
@@ -95,10 +95,10 @@ func (h *BorrowingGRPC) RejectBorrowingRequest(ctx context.Context, input *pb.Re
 	}
 	response := pb.BorrowingRequest{
 		Id:              uint64(res.ID),
-		LendingUserId:   res.LendingUserID,
-		BorrowingUserId: res.BorrowingUserID,
-		LendingPostId:   res.LendingPostID,
-		BorrowingPostId: res.BorrowingPostID,
+		LendingUserId:   uint64(res.LendingUserID),
+		BorrowingUserId: uint64(res.BorrowingUserID),
+		LendingPostId:   uint64(res.LendingPostID),
+		BorrowingPostId: uint64(res.BorrowingPostID),
 		Status:          util.MapModelToProtoStatus(res.Status),
 		ActiveStatus:    res.ActiveStatus,
 	}
@@ -118,10 +118,10 @@ func (h *BorrowingGRPC) ReturnItemRequest(ctx context.Context, input *pb.ReturnI
 	}
 	response := pb.BorrowingRequest{
 		Id:              uint64(res.ID),
-		LendingUserId:   res.LendingUserID,
-		BorrowingUserId: res.BorrowingUserID,
-		LendingPostId:   res.LendingPostID,
-		BorrowingPostId: res.BorrowingPostID,
+		LendingUserId:   uint64(res.LendingUserID),
+		BorrowingUserId: uint64(res.BorrowingUserID),
+		LendingPostId:   uint64(res.LendingPostID),
+		BorrowingPostId: uint64(res.BorrowingPostID),
 		Status:          util.MapModelToProtoStatus(res.Status),
 		ActiveStatus:    res.ActiveStatus,
 	}

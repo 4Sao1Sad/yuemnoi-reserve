@@ -3,25 +3,25 @@ option go_package = "github.com/KKhimmoon/yuemnoi-reserve";
 
 
 enum RequestStatus {
-    REJECT = 0;
+    REJECTED = 0;
     PENDING = 1;
-    ACCEPT = 2;
+    ACCEPTED = 2;
 }
 
 message BorrowingRequest {
     uint64 id = 1;
-    string lending_user_id = 2;
-    string borrowing_user_id = 3;
-    string lending_post_id = 4;
-    string borrowing_post_id = 5;
+    uint64 lending_user_id = 2;
+    uint64 borrowing_user_id = 3;
+    uint64 lending_post_id = 4;
+    uint64 borrowing_post_id = 5;
     RequestStatus status = 6;
     bool active_status = 7;
 }
 message CreateRequestFromBorrowingPostInput{
-    string lending_user_id = 1;
-    string borrowing_user_id = 2;
-    string lending_post_id = 3; 
-    string borrowing_post_id = 4;
+    uint64 lending_user_id = 1;
+    uint64 borrowing_user_id = 2;
+    uint64 lending_post_id = 3; 
+    uint64 borrowing_post_id = 4;
 }
 
 message CreateRequestFromBorrowingPostResponse {

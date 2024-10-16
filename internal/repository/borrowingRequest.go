@@ -30,7 +30,7 @@ func (r BorrowingRepositoryImpl) CreateRequestFromBorrowingPost(request model.Bo
 
 func (r BorrowingRepositoryImpl) GetRequestById(requestId uint) (model.BorrowingRequest, error) {
 	var request model.BorrowingRequest
-	if err := r.db.Where("id = ?", requestId).Find(&request).Error; err != nil {
+	if err := r.db.Where("id = ?", requestId).First(&request).Error; err != nil {
 		return model.BorrowingRequest{}, err
 	}
 
@@ -38,7 +38,7 @@ func (r BorrowingRepositoryImpl) GetRequestById(requestId uint) (model.Borrowing
 }
 
 func (r BorrowingRepositoryImpl) ConfirmBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error) {
-	if err := r.db.Model(&request).Update("status", model.Accept).Error; err != nil {
+	if err := r.db.Model(&request).Update("status", model.Accepted).Error; err != nil {
 		return model.BorrowingRequest{}, err
 	}
 	return request, nil
@@ -46,7 +46,7 @@ func (r BorrowingRepositoryImpl) ConfirmBorrowingRequest(request model.Borrowing
 
 func (r BorrowingRepositoryImpl) RejectBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error) {
 	if err := r.db.Model(&request).Updates(map[string]interface{}{
-		"status":        model.Reject,
+		"status":        model.Rejected,
 		"active_status": false,
 	}).Error; err != nil {
 		return model.BorrowingRequest{}, err
