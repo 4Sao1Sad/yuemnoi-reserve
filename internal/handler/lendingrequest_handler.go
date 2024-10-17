@@ -24,9 +24,9 @@ func NewLendingRequestGRPC(repo repository.LendingRequestRepository) *LendingReq
 
 func (g *LendingRequestGRPC) CreateLendingRequest(ctx context.Context, input *pb.CreateLendingRequestRequest) (*pb.CreateLendingRequestResponse, error) {
 	data := model.LendingRequest{
-		LendingUserID:   input.LendingUserId,
-		BorrowingUserID: input.BorrowingUserId,
-		PostID:          input.PostId,
+		LendingUserID:   uint(input.LendingUserId),
+		BorrowingUserID: uint(input.BorrowingUserId),
+		PostID:          uint(input.PostId),
 		Status:          model.Pending,
 		ActiveStatus:    true,
 	}
@@ -52,9 +52,9 @@ func (g *LendingRequestGRPC) GetLendingRequestDetail(ctx context.Context, input 
 
 	resp := pb.LendingRequest{
 		Id:              uint64(request.ID),
-		LendingUserId:   request.LendingUserID,
-		BorrowingUserId: request.BorrowingUserID,
-		PostId:          request.PostID,
+		LendingUserId:   uint64(request.LendingUserID),
+		BorrowingUserId: uint64(request.BorrowingUserID),
+		PostId:          uint64(request.PostID),
 		Status:          mapModelToProtoStatus(request.Status),
 		ActiveStatus:    request.ActiveStatus,
 	}
@@ -70,10 +70,10 @@ func (g *LendingRequestGRPC) RejectLendingRequest(ctx context.Context, input *pb
 
 	resp := pb.LendingRequest{
 		Id:              uint64(request.ID),
-		LendingUserId:   request.LendingUserID,
-		BorrowingUserId: request.BorrowingUserID,
-		PostId:          request.PostID,
-		Status:          mapModelToProtoStatus(model.Reject),
+		LendingUserId:   uint64(request.LendingUserID),
+		BorrowingUserId: uint64(request.BorrowingUserID),
+		PostId:          uint64(request.PostID),
+		Status:          mapModelToProtoStatus(model.Rejected),
 		ActiveStatus:    false,
 	}
 
@@ -88,10 +88,10 @@ func (g *LendingRequestGRPC) AcceptLendingRequest(ctx context.Context, input *pb
 
 	resp := pb.LendingRequest{
 		Id:              uint64(request.ID),
-		LendingUserId:   request.LendingUserID,
-		BorrowingUserId: request.BorrowingUserID,
-		PostId:          request.PostID,
-		Status:          mapModelToProtoStatus(model.Accept),
+		LendingUserId:   uint64(request.LendingUserID),
+		BorrowingUserId: uint64(request.BorrowingUserID),
+		PostId:          uint64(request.PostID),
+		Status:          mapModelToProtoStatus(model.Accepted),
 		ActiveStatus:    true,
 	}
 
@@ -106,10 +106,10 @@ func (g *LendingRequestGRPC) ReturnItem(ctx context.Context, input *pb.ReturnIte
 
 	resp := pb.LendingRequest{
 		Id:              uint64(request.ID),
-		LendingUserId:   request.LendingUserID,
-		BorrowingUserId: request.BorrowingUserID,
-		PostId:          request.PostID,
-		Status:          mapModelToProtoStatus(model.Accept),
+		LendingUserId:   uint64(request.LendingUserID),
+		BorrowingUserId: uint64(request.BorrowingUserID),
+		PostId:          uint64(request.PostID),
+		Status:          mapModelToProtoStatus(model.Accepted),
 		ActiveStatus:    false,
 	}
 
@@ -120,9 +120,9 @@ func mapModelToProtoStatus(status model.RequestStatus) pb.LendingRequestStatus {
 	switch status {
 	case model.Pending:
 		return pb.LendingRequestStatus_PENDING
-	case model.Accept:
+	case model.Accepted:
 		return pb.LendingRequestStatus_ACCEPT
-	case model.Reject:
+	case model.Rejected:
 		return pb.LendingRequestStatus_REJECT
 	default:
 		return pb.LendingRequestStatus_PENDING

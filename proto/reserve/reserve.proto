@@ -55,6 +55,7 @@ service BorrowingService {
 // The reserve message representing the structure of the Reserve object
 message LendingRequest {
     uint64 id = 1;           
+<<<<<<< HEAD
     string lending_user_id = 2;
     string borrowing_user_id = 3;
     string post_id = 4;   
@@ -62,6 +63,11 @@ message LendingRequest {
     RequestStatus status = 5;
     google.protobuf.Timestamp updated_at = 6;  
 =======
+=======
+    uint64 lending_user_id = 2;
+    uint64 borrowing_user_id = 3;
+    uint64 post_id = 4;   
+>>>>>>> ecec799 (fix: fix enum gramma and id type)
     LendingRequestStatus status = 5;
     bool activeStatus = 6;
 >>>>>>> 523ebd4 (feat: add return item and fix request name)
@@ -69,9 +75,9 @@ message LendingRequest {
 
 // Request message for creating a new Reserve
 message CreateLendingRequestRequest {
-    string lending_user_id = 1;
-    string borrowing_user_id = 2;
-    string post_id = 3;
+    uint64 lending_user_id = 1;
+    uint64 borrowing_user_id = 2;
+    uint64 post_id = 3;
 }
 
 // Response message for the CreateReserve service

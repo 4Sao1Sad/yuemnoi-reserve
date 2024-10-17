@@ -44,7 +44,7 @@ func (r LendingRequestRepositoryImpl) RejectLendingRequest(id uint64) (*model.Le
 	if err != nil {
 		return nil, err
 	}
-	request.Status = model.Reject
+	request.Status = model.Rejected
 	err = r.db.Save(&request).Error
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (r LendingRequestRepositoryImpl) AcceptLendingRequest(id uint64) (*model.Le
 	if err != nil {
 		return nil, err
 	}
-	request.Status = model.Accept
+	request.Status = model.Accepted
 	err = r.db.Save(&request).Error
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func (r LendingRequestRepositoryImpl) ReturnItem(id uint64) (*model.LendingReque
 	if err != nil {
 		return nil, err
 	}
-	request.Status = model.Accept
+	request.Status = model.Accepted
 	request.ActiveStatus = false
 	err = r.db.Save(&request).Error
 	if err != nil {
