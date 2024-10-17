@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/KKhimmoon/yuemnoi-reserve/db"
 	"github.com/KKhimmoon/yuemnoi-reserve/config"
+	"github.com/KKhimmoon/yuemnoi-reserve/db"
 )
 
 func main() {

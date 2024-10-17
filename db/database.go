@@ -30,6 +30,9 @@ func Migration(db *gorm.DB) {
 	if err := db.AutoMigrate(&model.BorrowingRequest{}); err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
+	if err := db.AutoMigrate(&model.LendingRequest{}); err != nil {
+		log.Fatalf("failed to migrate database: %v", err)
+	}
 }
 
 func ServerInit(cfg *config.Config, db *gorm.DB) error {
@@ -45,12 +48,15 @@ func ServerInit(cfg *config.Config, db *gorm.DB) error {
 	grpcServer := grpc.NewServer()
 
 	//repository
+	LendingRepository := repository.NewLendingRequestRepository(db)
 	BorrowingRepository := repository.NewBorrowingRepository(db)
 
 	//gRPC handler
 	BorrowingServer := handler.NewBorrowingGRPC(BorrowingRepository)
+	LendingServer := handler.NewLendingRequestGRPC(LendingRepository)
 
 	// Register service with the gRPC server
+	reserve.RegisterReserveServiceServer(grpcServer, LendingServer)
 	reserve.RegisterBorrowingServiceServer(grpcServer, BorrowingServer)
 
 	err = grpcServer.Serve(listen)
