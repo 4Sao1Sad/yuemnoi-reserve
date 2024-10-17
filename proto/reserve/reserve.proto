@@ -30,18 +30,18 @@ enum LendingRequestStatus {
 // The reserve message representing the structure of the Reserve object
 message LendingRequest {
     uint64 id = 1;           
-    string lending_user_id = 2;
-    string borrowing_user_id = 3;
-    string post_id = 4;   
+    uint64 lending_user_id = 2;
+    uint64 borrowing_user_id = 3;
+    uint64 post_id = 4;   
     LendingRequestStatus status = 5;
     bool activeStatus = 6;
 }
 
 // Request message for creating a new Reserve
 message CreateLendingRequestRequest {
-    string lending_user_id = 1;
-    string borrowing_user_id = 2;
-    string post_id = 3;
+    uint64 lending_user_id = 1;
+    uint64 borrowing_user_id = 2;
+    uint64 post_id = 3;
 }
 
 // Response message for the CreateReserve service

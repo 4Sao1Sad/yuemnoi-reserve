@@ -27,9 +27,6 @@ func InitPostgreSQL(cfg *config.Config) *gorm.DB {
 }
 
 func Migration(db *gorm.DB) {
-	if err := db.AutoMigrate(&model.Item{}); err != nil {
-		log.Fatalf("failed to migrate database: %v", err)
-	}
 	if err := db.AutoMigrate(&model.LendingRequest{}); err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
@@ -48,15 +45,12 @@ func ServerInit(cfg *config.Config, db *gorm.DB) error {
 	grpcServer := grpc.NewServer()
 
 	//repository
-	itemRepository := repository.NewItemRepository(db)
 	lendingRequestRepo := repository.NewLendingRequestRepository(db)
 
 	//gRPC handler
-	itemServer := handler.NewItemGRPC(itemRepository)
 	lendingRequestServer := handler.NewLendingRequestGRPC(lendingRequestRepo)
 
 	// Register service with the gRPC server
-	pb.RegisterItemServiceServer(grpcServer, itemServer)
 	pb.RegisterReserveServiceServer(grpcServer, lendingRequestServer)
 
 	err = grpcServer.Serve(listen)

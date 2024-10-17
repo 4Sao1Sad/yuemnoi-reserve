@@ -7,16 +7,16 @@ import (
 type RequestStatus string
 
 const (
-	Reject  RequestStatus = "Reject"
-	Pending RequestStatus = "Pending"
-	Accept  RequestStatus = "Accept"
+	Rejected RequestStatus = "Reject"
+	Pending  RequestStatus = "Pending"
+	Accepted RequestStatus = "Accept"
 )
 
 type LendingRequest struct {
 	gorm.Model
-	LendingUserID   string        `gorm:"type:varchar(255);not null"`
-	BorrowingUserID string        `gorm:"type:varchar(255);not null"`
-	PostID          string        `gorm:"type:varchar(255);not null"`
+	LendingUserID   uint          `gorm:"not null"`
+	BorrowingUserID uint          `gorm:"not null"`
+	PostID          uint          `gorm:"not null"`
 	Status          RequestStatus `gorm:"type:varchar(255);not null"`
 	ActiveStatus    bool          `gorm:"not null;default:false"`
 }
