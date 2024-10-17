@@ -10,73 +10,54 @@ type LendingRequestRepositoryImpl struct {
 }
 
 type LendingRequestRepository interface {
-	CreateLendingRequest(request model.LendingRequest) (*model.LendingRequest, error)
-	GetLendingRequestById(id uint64) (*model.LendingRequest, error)
-	RejectLendingRequest(id uint64) (*model.LendingRequest, error)
-	AcceptLendingRequest(id uint64) (*model.LendingRequest, error)
-	ReturnItem(id uint64) (*model.LendingRequest, error)
+	CreateLendingRequest(request model.LendingRequest) (model.LendingRequest, error)
+	GetLendingRequestById(requestId uint64) (model.LendingRequest, error)
+	RejectLendingRequest(request model.LendingRequest) (model.LendingRequest, error)
+	AcceptLendingRequest(request model.LendingRequest) (model.LendingRequest, error)
+	ReturnItemRequest(request model.LendingRequest) (model.LendingRequest, error)
 }
 
-func NewLendingRequestRepository(db *gorm.DB) LendingRequestRepository {
-	return &LendingRequestRepositoryImpl{db}
+func NewLendingRequestRepository(db *gorm.DB) *LendingRequestRepositoryImpl {
+	return &LendingRequestRepositoryImpl{db: db}
 }
 
-func (r LendingRequestRepositoryImpl) CreateLendingRequest(request model.LendingRequest) (*model.LendingRequest, error) {
+func (r LendingRequestRepositoryImpl) CreateLendingRequest(request model.LendingRequest) (model.LendingRequest, error) {
 	err := r.db.Create(&request).Error
 	if err != nil {
-		return nil, err
+		return model.LendingRequest{}, err
 	}
-	return &request, nil
+	return request, nil
 }
 
-func (r LendingRequestRepositoryImpl) GetLendingRequestById(id uint64) (*model.LendingRequest, error) {
+func (r LendingRequestRepositoryImpl) GetLendingRequestById(requestId uint64) (model.LendingRequest, error) {
 	var request model.LendingRequest
-	err := r.db.First(&request, id).Error
+	err := r.db.First(&request, requestId).Error
 	if err != nil {
-		return nil, err
+		return model.LendingRequest{}, err
 	}
-	return &request, nil
+	return request, nil
 }
 
-func (r LendingRequestRepositoryImpl) RejectLendingRequest(id uint64) (*model.LendingRequest, error) {
-	var request model.LendingRequest
-	err := r.db.First(&request, id).Error
-	if err != nil {
-		return nil, err
+func (r LendingRequestRepositoryImpl) RejectLendingRequest(request model.LendingRequest) (model.LendingRequest, error) {
+	if err := r.db.Model(&request).Updates(map[string]interface{}{
+		"status":        model.Rejected,
+		"active_status": false,
+	}).Error; err != nil {
+		return model.LendingRequest{}, err
 	}
-	request.Status = model.Rejected
-	err = r.db.Save(&request).Error
-	if err != nil {
-		return nil, err
-	}
-	return &request, nil
+	return request, nil
 }
 
-func (r LendingRequestRepositoryImpl) AcceptLendingRequest(id uint64) (*model.LendingRequest, error) {
-	var request model.LendingRequest
-	err := r.db.First(&request, id).Error
-	if err != nil {
-		return nil, err
+func (r LendingRequestRepositoryImpl) AcceptLendingRequest(request model.LendingRequest) (model.LendingRequest, error) {
+	if err := r.db.Model(&request).Update("status", model.Accepted).Error; err != nil {
+		return model.LendingRequest{}, err
 	}
-	request.Status = model.Accepted
-	err = r.db.Save(&request).Error
-	if err != nil {
-		return nil, err
-	}
-	return &request, nil
+	return request, nil
 }
 
-func (r LendingRequestRepositoryImpl) ReturnItem(id uint64) (*model.LendingRequest, error) {
-	var request model.LendingRequest
-	err := r.db.First(&request, id).Error
-	if err != nil {
-		return nil, err
+func (r LendingRequestRepositoryImpl) ReturnItemRequest(request model.LendingRequest) (model.LendingRequest, error) {
+	if err := r.db.Model(&request).Update("active_status", false).Error; err != nil {
+		return model.LendingRequest{}, err
 	}
-	request.Status = model.Accepted
-	request.ActiveStatus = false
-	err = r.db.Save(&request).Error
-	if err != nil {
-		return nil, err
-	}
-	return &request, nil
+	return request, nil
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/model"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/repository"
+	"github.com/KKhimmoon/yuemnoi-reserve/internal/util"
 	pb "github.com/KKhimmoon/yuemnoi-reserve/proto/reserve"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -24,9 +25,9 @@ func NewLendingRequestGRPC(repo repository.LendingRequestRepository) *LendingReq
 
 func (g *LendingRequestGRPC) CreateLendingRequest(ctx context.Context, input *pb.CreateLendingRequestRequest) (*pb.CreateLendingRequestResponse, error) {
 	data := model.LendingRequest{
-		LendingUserID:   uint(input.LendingUserId),
-		BorrowingUserID: uint(input.BorrowingUserId),
-		PostID:          uint(input.PostId),
+		LendingUserID:   uint64(input.LendingUserId),
+		BorrowingUserID: uint64(input.BorrowingUserId),
+		PostID:          uint64(input.PostId),
 		Status:          model.Pending,
 		ActiveStatus:    true,
 	}
@@ -38,7 +39,7 @@ func (g *LendingRequestGRPC) CreateLendingRequest(ctx context.Context, input *pb
 
 	resp := pb.CreateLendingRequestResponse{
 		Id:      uint64(data.ID),
-		Message: "created",
+		Message: "created successfully",
 	}
 
 	return &resp, nil
@@ -55,7 +56,7 @@ func (g *LendingRequestGRPC) GetLendingRequestDetail(ctx context.Context, input 
 		LendingUserId:   uint64(request.LendingUserID),
 		BorrowingUserId: uint64(request.BorrowingUserID),
 		PostId:          uint64(request.PostID),
-		Status:          mapModelToProtoStatus(request.Status),
+		Status:          util.MapModelToProtoStatus(request.Status),
 		ActiveStatus:    request.ActiveStatus,
 	}
 
@@ -63,68 +64,69 @@ func (g *LendingRequestGRPC) GetLendingRequestDetail(ctx context.Context, input 
 }
 
 func (g *LendingRequestGRPC) RejectLendingRequest(ctx context.Context, input *pb.RejectLendingRequestRequest) (*pb.LendingRequest, error) {
-	request, err := g.repository.RejectLendingRequest(input.Id)
+	res, err := g.repository.GetLendingRequestById(input.Id)
 	if err != nil {
-		return nil, status.Error(codes.NotFound, err.Error())
+		return nil, status.Errorf(codes.NotFound, "Lending request not found: %v", err)
 	}
 
+	res, err = g.repository.RejectLendingRequest(res)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to reject lending request: %v", err)
+	}
 	resp := pb.LendingRequest{
-		Id:              uint64(request.ID),
-		LendingUserId:   uint64(request.LendingUserID),
-		BorrowingUserId: uint64(request.BorrowingUserID),
-		PostId:          uint64(request.PostID),
-		Status:          mapModelToProtoStatus(model.Rejected),
-		ActiveStatus:    false,
+		Id:              uint64(res.ID),
+		LendingUserId:   uint64(res.LendingUserID),
+		BorrowingUserId: uint64(res.BorrowingUserID),
+		PostId:          uint64(res.PostID),
+		Status:          util.MapModelToProtoStatus(res.Status),
+		ActiveStatus:    res.ActiveStatus,
 	}
 
 	return &resp, nil
 }
 
 func (g *LendingRequestGRPC) AcceptLendingRequest(ctx context.Context, input *pb.AcceptLendingRequestRequest) (*pb.LendingRequest, error) {
-	request, err := g.repository.AcceptLendingRequest(input.Id)
+	res, err := g.repository.GetLendingRequestById(input.Id)
 	if err != nil {
-		return nil, status.Error(codes.NotFound, err.Error())
+		return nil, status.Errorf(codes.NotFound, "Lending request not found: %v", err)
+	}
+
+	res, err = g.repository.AcceptLendingRequest(res)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to confirm lending request: %v", err)
 	}
 
 	resp := pb.LendingRequest{
-		Id:              uint64(request.ID),
-		LendingUserId:   uint64(request.LendingUserID),
-		BorrowingUserId: uint64(request.BorrowingUserID),
-		PostId:          uint64(request.PostID),
-		Status:          mapModelToProtoStatus(model.Accepted),
-		ActiveStatus:    true,
+		Id:              uint64(res.ID),
+		LendingUserId:   uint64(res.LendingUserID),
+		BorrowingUserId: uint64(res.BorrowingUserID),
+		PostId:          uint64(res.PostID),
+		Status:          util.MapModelToProtoStatus(res.Status),
+		ActiveStatus:    res.ActiveStatus,
 	}
 
 	return &resp, nil
 }
 
-func (g *LendingRequestGRPC) ReturnItem(ctx context.Context, input *pb.ReturnItemRequest) (*pb.LendingRequest, error) {
-	request, err := g.repository.ReturnItem(input.Id)
+func (g *LendingRequestGRPC) ReturnItemRequest(ctx context.Context, input *pb.ReturnItemRequest) (*pb.LendingRequest, error) {
+	res, err := g.repository.GetLendingRequestById(input.Id)
 	if err != nil {
-		return nil, status.Error(codes.NotFound, err.Error())
+		return nil, status.Errorf(codes.NotFound, "Lending request not found: %v", err)
+	}
+
+	res, err = g.repository.ReturnItemRequest(res)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to return item from lending request: %v", err)
 	}
 
 	resp := pb.LendingRequest{
-		Id:              uint64(request.ID),
-		LendingUserId:   uint64(request.LendingUserID),
-		BorrowingUserId: uint64(request.BorrowingUserID),
-		PostId:          uint64(request.PostID),
-		Status:          mapModelToProtoStatus(model.Accepted),
-		ActiveStatus:    false,
+		Id:              uint64(res.ID),
+		LendingUserId:   uint64(res.LendingUserID),
+		BorrowingUserId: uint64(res.BorrowingUserID),
+		PostId:          uint64(res.PostID),
+		Status:          util.MapModelToProtoStatus(res.Status),
+		ActiveStatus:    res.ActiveStatus,
 	}
 
 	return &resp, nil
-}
-
-func mapModelToProtoStatus(status model.RequestStatus) pb.LendingRequestStatus {
-	switch status {
-	case model.Pending:
-		return pb.LendingRequestStatus_PENDING
-	case model.Accepted:
-		return pb.LendingRequestStatus_ACCEPT
-	case model.Rejected:
-		return pb.LendingRequestStatus_REJECT
-	default:
-		return pb.LendingRequestStatus_PENDING
-	}
 }

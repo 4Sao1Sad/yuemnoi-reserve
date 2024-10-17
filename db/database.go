@@ -48,15 +48,15 @@ func ServerInit(cfg *config.Config, db *gorm.DB) error {
 	grpcServer := grpc.NewServer()
 
 	//repository
-	lendingRequestRepo := repository.NewLendingRequestRepository(db)
+	LendingRepository := repository.NewLendingRequestRepository(db)
 	BorrowingRepository := repository.NewBorrowingRepository(db)
 
 	//gRPC handler
 	BorrowingServer := handler.NewBorrowingGRPC(BorrowingRepository)
-	lendingRequestServer := handler.NewLendingRequestGRPC(lendingRequestRepo)
+	LendingServer := handler.NewLendingRequestGRPC(LendingRepository)
 
 	// Register service with the gRPC server
-	reserve.RegisterReserveServiceServer(grpcServer, lendingRequestServer)
+	reserve.RegisterReserveServiceServer(grpcServer, LendingServer)
 	reserve.RegisterBorrowingServiceServer(grpcServer, BorrowingServer)
 
 	err = grpcServer.Serve(listen)

@@ -4,14 +4,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type RequestStatus string
-
-const (
-	Rejected RequestStatus = "Rejected"
-	Pending  RequestStatus = "Pending"
-	Accepted RequestStatus = "Accepted"
-)
-
 type BorrowingRequest struct {
 	gorm.Model
 	LendingUserID   uint          `gorm:"not null"`
