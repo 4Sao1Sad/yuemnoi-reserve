@@ -3,6 +3,7 @@ module github.com/KKhimmoon/yuemnoi-reserve
 go 1.23.1
 
 require (
+	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/spf13/viper v1.19.0
 	google.golang.org/grpc v1.67.1
 	google.golang.org/protobuf v1.34.2

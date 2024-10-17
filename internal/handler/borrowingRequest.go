@@ -3,6 +3,9 @@ package handler
 import (
 	"context"
 
+	"yuemnoi-reserve/dto"
+
+	"github.com/KKhimmoon/yuemnoi-reserve/internal/event"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/model"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/repository"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/util"
@@ -35,6 +38,12 @@ func (h *BorrowingGRPC) CreateRequestFromBorrowingPost(ctx context.Context, inpu
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to create borrowing request: %v", err)
 	}
+	requestFromBorrowingNoti := dto.NotificationRequest{
+		Message: "You get a new offer, please check your Request list.",
+		UserIds: []int{int(input.BorrowingUserId)},
+	}
+	event.SendNotification(requestFromBorrowingNoti)
+
 	response := pb.CreateRequestFromBorrowingPostResponse{
 		Message: "created successfully",
 	}
