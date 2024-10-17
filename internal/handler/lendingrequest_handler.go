@@ -38,7 +38,6 @@ func (g *LendingRequestGRPC) CreateLendingRequest(ctx context.Context, input *pb
 	}
 
 	resp := pb.CreateLendingRequestResponse{
-		Id:      uint64(data.ID),
 		Message: "created successfully",
 	}
 
@@ -108,7 +107,7 @@ func (g *LendingRequestGRPC) AcceptLendingRequest(ctx context.Context, input *pb
 	return &resp, nil
 }
 
-func (g *LendingRequestGRPC) ReturnItemRequest(ctx context.Context, input *pb.ReturnItemRequest) (*pb.LendingRequest, error) {
+func (g *LendingRequestGRPC) ReturnItemRequest(ctx context.Context, input *pb.ReturnItemRequestRequest) (*pb.LendingRequest, error) {
 	res, err := g.repository.GetLendingRequestById(input.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Lending request not found: %v", err)

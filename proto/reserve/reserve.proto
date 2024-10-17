@@ -88,7 +88,7 @@ message AcceptLendingRequestRequest {
     uint64 id = 1;
 }
 
-message ReturnItemRequest {
+message ReturnItemRequestRequest {
     uint64 id = 1;
 }
 
@@ -97,5 +97,5 @@ service ReserveService {
     rpc GetLendingRequestDetail(GetLendingRequestDetailRequest) returns (LendingRequest) {}
     rpc RejectLendingRequest(RejectLendingRequestRequest) returns (LendingRequest) {}
     rpc AcceptLendingRequest(AcceptLendingRequestRequest) returns (LendingRequest) {}
-    rpc ReturnItem(ReturnItemRequest) returns (LendingRequest) {}
+    rpc ReturnItemRequest(ReturnItemRequestRequest) returns (LendingRequest) {}
 }

@@ -277,7 +277,7 @@ const (
 	ReserveService_GetLendingRequestDetail_FullMethodName = "/ReserveService/GetLendingRequestDetail"
 	ReserveService_RejectLendingRequest_FullMethodName    = "/ReserveService/RejectLendingRequest"
 	ReserveService_AcceptLendingRequest_FullMethodName    = "/ReserveService/AcceptLendingRequest"
-	ReserveService_ReturnItem_FullMethodName              = "/ReserveService/ReturnItem"
+	ReserveService_ReturnItemRequest_FullMethodName       = "/ReserveService/ReturnItemRequest"
 )
 
 // ReserveServiceClient is the client API for ReserveService service.
@@ -288,7 +288,7 @@ type ReserveServiceClient interface {
 	GetLendingRequestDetail(ctx context.Context, in *GetLendingRequestDetailRequest, opts ...grpc.CallOption) (*LendingRequest, error)
 	RejectLendingRequest(ctx context.Context, in *RejectLendingRequestRequest, opts ...grpc.CallOption) (*LendingRequest, error)
 	AcceptLendingRequest(ctx context.Context, in *AcceptLendingRequestRequest, opts ...grpc.CallOption) (*LendingRequest, error)
-	ReturnItem(ctx context.Context, in *ReturnItemRequest, opts ...grpc.CallOption) (*LendingRequest, error)
+	ReturnItemRequest(ctx context.Context, in *ReturnItemRequestRequest, opts ...grpc.CallOption) (*LendingRequest, error)
 }
 
 type reserveServiceClient struct {
@@ -339,10 +339,10 @@ func (c *reserveServiceClient) AcceptLendingRequest(ctx context.Context, in *Acc
 	return out, nil
 }
 
-func (c *reserveServiceClient) ReturnItem(ctx context.Context, in *ReturnItemRequest, opts ...grpc.CallOption) (*LendingRequest, error) {
+func (c *reserveServiceClient) ReturnItemRequest(ctx context.Context, in *ReturnItemRequestRequest, opts ...grpc.CallOption) (*LendingRequest, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LendingRequest)
-	err := c.cc.Invoke(ctx, ReserveService_ReturnItem_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ReserveService_ReturnItemRequest_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +357,7 @@ type ReserveServiceServer interface {
 	GetLendingRequestDetail(context.Context, *GetLendingRequestDetailRequest) (*LendingRequest, error)
 	RejectLendingRequest(context.Context, *RejectLendingRequestRequest) (*LendingRequest, error)
 	AcceptLendingRequest(context.Context, *AcceptLendingRequestRequest) (*LendingRequest, error)
-	ReturnItem(context.Context, *ReturnItemRequest) (*LendingRequest, error)
+	ReturnItemRequest(context.Context, *ReturnItemRequestRequest) (*LendingRequest, error)
 	mustEmbedUnimplementedReserveServiceServer()
 }
 
@@ -380,8 +380,8 @@ func (UnimplementedReserveServiceServer) RejectLendingRequest(context.Context, *
 func (UnimplementedReserveServiceServer) AcceptLendingRequest(context.Context, *AcceptLendingRequestRequest) (*LendingRequest, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AcceptLendingRequest not implemented")
 }
-func (UnimplementedReserveServiceServer) ReturnItem(context.Context, *ReturnItemRequest) (*LendingRequest, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReturnItem not implemented")
+func (UnimplementedReserveServiceServer) ReturnItemRequest(context.Context, *ReturnItemRequestRequest) (*LendingRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReturnItemRequest not implemented")
 }
 func (UnimplementedReserveServiceServer) mustEmbedUnimplementedReserveServiceServer() {}
 func (UnimplementedReserveServiceServer) testEmbeddedByValue()                        {}
@@ -476,20 +476,20 @@ func _ReserveService_AcceptLendingRequest_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ReserveService_ReturnItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReturnItemRequest)
+func _ReserveService_ReturnItemRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReturnItemRequestRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ReserveServiceServer).ReturnItem(ctx, in)
+		return srv.(ReserveServiceServer).ReturnItemRequest(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ReserveService_ReturnItem_FullMethodName,
+		FullMethod: ReserveService_ReturnItemRequest_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReserveServiceServer).ReturnItem(ctx, req.(*ReturnItemRequest))
+		return srv.(ReserveServiceServer).ReturnItemRequest(ctx, req.(*ReturnItemRequestRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -518,8 +518,8 @@ var ReserveService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ReserveService_AcceptLendingRequest_Handler,
 		},
 		{
-			MethodName: "ReturnItem",
-			Handler:    _ReserveService_ReturnItem_Handler,
+			MethodName: "ReturnItemRequest",
+			Handler:    _ReserveService_ReturnItemRequest_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
