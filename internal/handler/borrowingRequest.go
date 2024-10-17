@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/KKhimmoon/yuemnoi-reserve/dto"
+
+	"github.com/KKhimmoon/yuemnoi-reserve/internal/event"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/model"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/repository"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/util"
@@ -43,6 +46,12 @@ func (h *BorrowingGRPC) CreateBorrowingRequest(ctx context.Context, input *pb.Cr
 	if errLog != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to log activity: %v", errLog)
 	}
+	requestFromBorrowingNoti := dto.NotificationRequest{
+		Message: "You get a new offer, please check your Request list.",
+		UserIds: []int{int(input.BorrowingUserId)},
+	}
+	event.SendNotification(requestFromBorrowingNoti)
+
 	response := pb.CreateBorrowingRequestResponse{
 		Message: "created successfully",
 	}
