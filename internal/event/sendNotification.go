@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"reflect"
 	"time"
 
-	"yuemnoi-reserve/dto"
+	"github.com/KKhimmoon/yuemnoi-reserve/dto"
 
-	"yuemnoi-notification/internal/config"
+	"github.com/KKhimmoon/yuemnoi-reserve/internal/config"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -23,6 +24,9 @@ func SendNotification(notification dto.NotificationRequest) {
         log.Fatalf("[client]: failed to marshal notification %+v", err)
     }
 
+		log.Print(body)
+		log.Print(reflect.TypeOf(body))
+
     conn, err := amqp.Dial(cfg.RabbitMQUrl)
     if err != nil {
         log.Fatalf("[client]: unable to connect RabbitMQ %+v", err)
@@ -36,7 +40,7 @@ func SendNotification(notification dto.NotificationRequest) {
     defer ch.Close()
 
     q, err := ch.QueueDeclare(
-        "notificationQueue", // name (use a common queue name for communication)
+        "notification", // name (use a common queue name for communication)
         true,    // durable
         false,   // delete when unused
         false,   // exclusive
@@ -56,12 +60,13 @@ func SendNotification(notification dto.NotificationRequest) {
         false,  // mandatory
         false,  // immediate
         amqp.Publishing{
-            ContentType: "application/json", // JSON for structured messages
-            Body:        body,
+						ContentType: "text/plain",
+						Body:        []byte(body),
         })
     if err != nil {
         log.Fatalf("[client]: failed to publish a message %+v", err)
     }
 
     log.Print(" [x] Notification Sent from yuemnoi-reserve \n")
+		log.Print(notification)
 }

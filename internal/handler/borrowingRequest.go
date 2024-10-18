@@ -46,11 +46,12 @@ func (h *BorrowingGRPC) CreateBorrowingRequest(ctx context.Context, input *pb.Cr
 	if errLog != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to log activity: %v", errLog)
 	}
+	
 	requestFromBorrowingNoti := dto.NotificationRequest{
 		Message: "You get a new offer, please check your Request list.",
 		UserIds: []int{int(input.BorrowingUserId)},
 	}
-	event.SendNotification(requestFromBorrowingNoti)
+	event.SendNotification(requestFromBorrowingPostNoti)
 
 	response := pb.CreateBorrowingRequestResponse{
 		Message: "created successfully",
@@ -114,6 +115,12 @@ func (h *BorrowingGRPC) AcceptBorrowingRequest(ctx context.Context, input *pb.Ac
 		ActiveStatus:    res.ActiveStatus,
 	}
 
+	confirmBorrowingRequestNoti := dto.NotificationRequest{
+		Message: "Your offer is accepted, please check the Active items.",
+		UserIds: []int{int(res.LendingUserID)},
+	}
+	event.SendNotification(confirmBorrowingRequestNoti)
+
 	return &response, nil
 }
 
@@ -142,6 +149,12 @@ func (h *BorrowingGRPC) RejectBorrowingRequest(ctx context.Context, input *pb.Re
 		Status:          util.MapModelToProtoStatus(res.Status),
 		ActiveStatus:    res.ActiveStatus,
 	}
+
+	rejectBorrowingRequestNoti := dto.NotificationRequest{
+		Message: "Your offer is rejected.",
+		UserIds: []int{int(res.LendingUserID)},
+	}
+	event.SendNotification(rejectBorrowingRequestNoti)
 
 	return &response, nil
 }
@@ -177,6 +190,12 @@ func (h *BorrowingGRPC) ReturnItemBorrowingRequest(ctx context.Context, input *p
 		Status:          util.MapModelToProtoStatus(res.Status),
 		ActiveStatus:    res.ActiveStatus,
 	}
+
+	returnItemRequestNoti := dto.NotificationRequest{
+		Message: "Your Items returning is confirmed.",
+		UserIds: []int{int(res.LendingUserID)},
+	}
+	event.SendNotification(returnItemRequestNoti)
 
 	return &response, nil
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/KKhimmoon/yuemnoi-reserve/dto"
+	"github.com/KKhimmoon/yuemnoi-reserve/internal/event"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/model"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/repository"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/util"
@@ -46,6 +48,12 @@ func (g *LendingRequestGRPC) CreateLendingRequest(ctx context.Context, input *pb
 	resp := pb.CreateLendingRequestResponse{
 		Message: "created successfully",
 	}
+
+	requestFromLendingPostNoti := dto.NotificationRequest{
+		Message: "You get a new request, please check your Request list.",
+		UserIds: []int{int(input.LendingUserId)},
+	}
+	event.SendNotification(requestFromLendingPostNoti)
 
 	return &resp, nil
 }
@@ -95,6 +103,12 @@ func (g *LendingRequestGRPC) RejectLendingRequest(ctx context.Context, input *pb
 		ActiveStatus:    res.ActiveStatus,
 	}
 
+	rejectLendingRequestNoti := dto.NotificationRequest{
+		Message: "Your request is rejected.",
+		UserIds: []int{int(res.BorrowingUserID)},
+	}
+	event.SendNotification(rejectLendingRequestNoti)
+
 	return &resp, nil
 }
 
@@ -129,6 +143,12 @@ func (g *LendingRequestGRPC) AcceptLendingRequest(ctx context.Context, input *pb
 		ActiveStatus:    res.ActiveStatus,
 	}
 
+	acceptLendingRequestNoti := dto.NotificationRequest{
+		Message: "Your request is accepted, please check the Active items.",
+		UserIds: []int{int(res.BorrowingUserID)},
+	}
+	event.SendNotification(acceptLendingRequestNoti)
+
 	return &resp, nil
 }
 
@@ -161,6 +181,12 @@ func (g *LendingRequestGRPC) ReturnItemLendingRequest(ctx context.Context, input
 		Status:          util.MapModelToProtoStatus(res.Status),
 		ActiveStatus:    res.ActiveStatus,
 	}
+
+	returnItemRequestNoti := dto.NotificationRequest{
+		Message: "Your Items returning is confirmed.",
+		UserIds: []int{int(res.LendingUserID)},
+	}
+	event.SendNotification(returnItemRequestNoti)
 
 	return &resp, nil
 }
