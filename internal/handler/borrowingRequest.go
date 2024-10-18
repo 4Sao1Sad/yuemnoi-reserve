@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	"yuemnoi-reserve/dto"
+	"github.com/KKhimmoon/yuemnoi-reserve/dto"
 
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/event"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/model"
@@ -38,11 +38,12 @@ func (h *BorrowingGRPC) CreateRequestFromBorrowingPost(ctx context.Context, inpu
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to create borrowing request: %v", err)
 	}
-	requestFromBorrowingNoti := dto.NotificationRequest{
+
+	requestFromBorrowingPostNoti := dto.NotificationRequest{
 		Message: "You get a new offer, please check your Request list.",
 		UserIds: []int{int(input.BorrowingUserId)},
 	}
-	event.SendNotification(requestFromBorrowingNoti)
+	event.SendNotification(requestFromBorrowingPostNoti)
 
 	response := pb.CreateRequestFromBorrowingPostResponse{
 		Message: "created successfully",
@@ -89,6 +90,12 @@ func (h *BorrowingGRPC) ConfirmBorrowingRequest(ctx context.Context, input *pb.C
 		ActiveStatus:    res.ActiveStatus,
 	}
 
+	confirmBorrowingRequestNoti := dto.NotificationRequest{
+		Message: "Your offer is accepted, please check the Active items.",
+		UserIds: []int{int(res.LendingUserID)},
+	}
+	event.SendNotification(confirmBorrowingRequestNoti)
+
 	return &response, nil
 }
 
@@ -112,6 +119,12 @@ func (h *BorrowingGRPC) RejectBorrowingRequest(ctx context.Context, input *pb.Re
 		ActiveStatus:    res.ActiveStatus,
 	}
 
+	rejectBorrowingRequestNoti := dto.NotificationRequest{
+		Message: "Your offer is rejected.",
+		UserIds: []int{int(res.LendingUserID)},
+	}
+	event.SendNotification(rejectBorrowingRequestNoti)
+
 	return &response, nil
 }
 
@@ -134,6 +147,12 @@ func (h *BorrowingGRPC) ReturnItemRequest(ctx context.Context, input *pb.ReturnI
 		Status:          util.MapModelToProtoStatus(res.Status),
 		ActiveStatus:    res.ActiveStatus,
 	}
+
+	returnItemRequestNoti := dto.NotificationRequest{
+		Message: "Your Items returning is confirmed.",
+		UserIds: []int{int(res.LendingUserID)},
+	}
+	event.SendNotification(returnItemRequestNoti)
 
 	return &response, nil
 }
