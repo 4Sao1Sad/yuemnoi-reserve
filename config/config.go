@@ -2,13 +2,16 @@ package config
 
 import (
 	"log"
+
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	AppName string       `yaml:"app_name"`
-	Port    int32        `yaml:"port"`
-	Db      DBConfig     `mapstructure:"DB"`
+	AppName         string   `yaml:"appName"`
+	Port            int32    `yaml:"port"`
+	ActivityLogPort int32    `yaml:"activityLogPort"`
+	PostPort        int32    `yaml:"postPort"`
+	Db              DBConfig `yaml:"DB"`
 }
 
 type DBConfig struct {
