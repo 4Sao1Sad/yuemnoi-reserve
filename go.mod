@@ -1,6 +1,6 @@
 module github.com/KKhimmoon/yuemnoi-reserve
 
-go 1.23.1
+go 1.23.0
 
 require (
 	firebase.google.com/go v3.13.0+incompatible
