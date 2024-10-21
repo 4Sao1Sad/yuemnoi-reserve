@@ -27,10 +27,7 @@ func InitPostgreSQL(cfg *config.Config) *gorm.DB {
 }
 
 func Migration(db *gorm.DB) {
-	if err := db.AutoMigrate(&model.BorrowingRequest{}); err != nil {
-		log.Fatalf("failed to migrate database: %v", err)
-	}
-	if err := db.AutoMigrate(&model.LendingRequest{}); err != nil {
+	if err := db.AutoMigrate(&model.BorrowingRequest{}, &model.LendingRequest{}); err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
 	}
 }

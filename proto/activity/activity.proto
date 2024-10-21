@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+option go_package = "github.com/KKhimmoon/yuemnoi-reserve/proto/activity";
+
+message ActivityLog {
+	string logDetail = 1;
+	uint64 user_id = 2;
+	string timestamp = 3;
+}
+
+message CreateActivityLogRequest {
+    string logDetail = 1;
+	uint64 user_id = 2;       
+}
+
+message CreateActivityLogResponse {
+	ActivityLog activityLog = 1;      
+}
+
+service ActivityLogService {
+	rpc CreateActivityLog(CreateActivityLogRequest) returns (CreateActivityLogResponse) {}
+}

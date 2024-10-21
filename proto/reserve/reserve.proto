@@ -17,14 +17,14 @@ message BorrowingRequest {
     RequestStatus status = 6;
     bool active_status = 7;
 }
-message CreateRequestFromBorrowingPostInput{
+message CreateBorrowingRequestInput{
     uint64 lending_user_id = 1;
     uint64 borrowing_user_id = 2;
     uint64 lending_post_id = 3; 
     uint64 borrowing_post_id = 4;
 }
 
-message CreateRequestFromBorrowingPostResponse {
+message CreateBorrowingRequestResponse {
     string message = 1; 
 }
 
@@ -32,7 +32,7 @@ message GetBorrowingRequestInput {
     uint64 id = 1;
 }
 
-message ConfirmBorrowingRequestInput {
+message AcceptBorrowingRequestInput {
     uint64 id = 1;
 }
 
@@ -40,16 +40,16 @@ message RejectBorrowingRequestInput  {
     uint64 id = 1;
 }
 
-message ReturnItemRequestInput {
+message ReturnItemBorrowingRequestInput {
     uint64 id = 1;
 }
 
 service BorrowingService {
-    rpc CreateRequestFromBorrowingPost(CreateRequestFromBorrowingPostInput) returns (CreateRequestFromBorrowingPostResponse);
+    rpc CreateBorrowingRequest(CreateBorrowingRequestInput) returns (CreateBorrowingRequestResponse);
     rpc GetBorrowingRequestById(GetBorrowingRequestInput) returns (BorrowingRequest);
-    rpc ConfirmBorrowingRequest(ConfirmBorrowingRequestInput ) returns (BorrowingRequest);
+    rpc AcceptBorrowingRequest (AcceptBorrowingRequestInput) returns (BorrowingRequest);
     rpc RejectBorrowingRequest(RejectBorrowingRequestInput ) returns (BorrowingRequest);
-    rpc ReturnItemRequest(ReturnItemRequestInput) returns (BorrowingRequest);
+    rpc ReturnItemBorrowingRequest(ReturnItemBorrowingRequestInput) returns (BorrowingRequest);
 }
 
 // The reserve message representing the structure of the Reserve object
@@ -63,39 +63,38 @@ message LendingRequest {
 }
 
 // Request message for creating a new Reserve
-message CreateLendingRequestRequest {
+message CreateLendingRequestInput {
     uint64 lending_user_id = 1;
     uint64 borrowing_user_id = 2;
     uint64 post_id = 3;
 }
 
 // Response message for the CreateReserve service
-message CreateLendingRequestResponse {
-    uint64 id = 1;            
-    string message = 2;       
+message CreateLendingRequestResponse {      
+    string message = 1;       
 }
 
 // Request message for fetching Reserve details
-message GetLendingRequestDetailRequest {
+message  GetLendingRequestInput {
     uint64 id = 1;
 }
 
-message RejectLendingRequestRequest {
+message RejectLendingRequestInput {
     uint64 id = 1;
 }
 
-message AcceptLendingRequestRequest {
+message AcceptLendingRequestInput {
     uint64 id = 1;
 }
 
-message ReturnItemRequestRequest {
+message ReturnItemLendingRequestInput {
     uint64 id = 1;
 }
 
 service ReserveService {
-    rpc CreateLendingRequest(CreateLendingRequestRequest) returns (CreateLendingRequestResponse) {}
-    rpc GetLendingRequestDetail(GetLendingRequestDetailRequest) returns (LendingRequest) {}
-    rpc RejectLendingRequest(RejectLendingRequestRequest) returns (LendingRequest) {}
-    rpc AcceptLendingRequest(AcceptLendingRequestRequest) returns (LendingRequest) {}
-    rpc ReturnItemRequest(ReturnItemRequestRequest) returns (LendingRequest) {}
+    rpc CreateLendingRequest(CreateLendingRequestInput) returns (CreateLendingRequestResponse) {}
+    rpc GetLendingRequestById(GetLendingRequestInput) returns (LendingRequest) {}
+    rpc RejectLendingRequest(RejectLendingRequestInput) returns (LendingRequest) {}
+    rpc AcceptLendingRequest(AcceptLendingRequestInput) returns (LendingRequest) {}
+    rpc ReturnItemLendingRequest(ReturnItemLendingRequestInput) returns (LendingRequest) {}
 }

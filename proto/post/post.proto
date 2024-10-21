@@ -1,0 +1,43 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+option go_package = "github.com/KKhimmoon/yuemnoi-reserve/proto/post";
+
+// Request message for updating a LendingPost
+message UpdateLendingPostRequest {
+    uint64 id = 1;  
+    string item_name = 2;                  
+    string description = 3;   
+    double price = 4;         
+    bool active_status = 5;   
+    string image_url = 6;       
+    google.protobuf.FieldMask update_mask = 7; // Specify which fields to update
+}
+
+// Response message for the UpdateLendingPost service
+message UpdateLendingPostResponse {
+    string message = 1;       
+}
+
+// Request message for updating a BorrowingPost
+message UpdateBorrowingPostRequest {
+    uint64 id = 1;                  
+    string description = 2;       
+    bool active_status = 3;   
+    google.protobuf.FieldMask update_mask = 4; // Specify which fields to update
+}
+
+// Response message for the UpdateBorrowingPost service
+message UpdateBorrowingPostResponse {
+    string message = 1;       
+}
+
+service BorrowingPostService {
+// RPC method to create a new BorrowingPost
+    rpc UpdateBorrowingPost(UpdateBorrowingPostRequest) returns (UpdateBorrowingPostResponse){}
+}
+
+// LendingPostService definition
+service LendingPostService {
+    rpc UpdateLendingPost(UpdateLendingPostRequest) returns (UpdateLendingPostResponse){}
+}

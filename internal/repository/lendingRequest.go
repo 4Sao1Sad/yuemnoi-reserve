@@ -14,7 +14,7 @@ type LendingRequestRepository interface {
 	GetLendingRequestById(requestId uint64) (model.LendingRequest, error)
 	RejectLendingRequest(request model.LendingRequest) (model.LendingRequest, error)
 	AcceptLendingRequest(request model.LendingRequest) (model.LendingRequest, error)
-	ReturnItemRequest(request model.LendingRequest) (model.LendingRequest, error)
+	ReturnItemLendingRequest(request model.LendingRequest) (model.LendingRequest, error)
 }
 
 func NewLendingRequestRepository(db *gorm.DB) *LendingRequestRepositoryImpl {
@@ -55,7 +55,7 @@ func (r LendingRequestRepositoryImpl) AcceptLendingRequest(request model.Lending
 	return request, nil
 }
 
-func (r LendingRequestRepositoryImpl) ReturnItemRequest(request model.LendingRequest) (model.LendingRequest, error) {
+func (r LendingRequestRepositoryImpl) ReturnItemLendingRequest(request model.LendingRequest) (model.LendingRequest, error) {
 	if err := r.db.Model(&request).Update("active_status", false).Error; err != nil {
 		return model.LendingRequest{}, err
 	}
