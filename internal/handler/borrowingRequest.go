@@ -51,7 +51,7 @@ func (h *BorrowingGRPC) CreateBorrowingRequest(ctx context.Context, input *pb.Cr
 		Message: "You get a new offer, please check your Request list.",
 		UserIds: []int{int(input.BorrowingUserId)},
 	}
-	event.SendNotification(requestFromBorrowingPostNoti)
+	event.SendNotification(requestFromBorrowingNoti)
 
 	response := pb.CreateBorrowingRequestResponse{
 		Message: "created successfully",
