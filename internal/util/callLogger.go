@@ -2,7 +2,6 @@ package util
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/KKhimmoon/yuemnoi-reserve/config"
@@ -13,8 +12,7 @@ import (
 
 func CallActivityLogService(userID uint64, logDetail string) error {
 	cfg := config.Load()
-	addr := fmt.Sprintf("localhost:%d", cfg.ActivityLogPort)
-	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(cfg.ActivityLogUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Printf("Failed to connect to ActivityLogService: %v", err)
 		return err

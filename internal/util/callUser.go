@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/KKhimmoon/yuemnoi-reserve/config"
 )
 
 func CheckUserExists(borrowingUserID uint, lendingUserID uint) error {
@@ -17,7 +19,8 @@ func CheckUserExists(borrowingUserID uint, lendingUserID uint) error {
 	return nil
 }
 func checkSingleUser(userID uint) error {
-	url := fmt.Sprintf("http://localhost:8080/user/%d", userID)
+	cfg := config.Load()
+	url := fmt.Sprintf("%s%d", cfg.UserInfoURL, userID)
 	resp, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("failed to call user service: %v", err)

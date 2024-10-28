@@ -7,12 +7,13 @@ import (
 )
 
 type Config struct {
-	AppName         string   `yaml:"appName"`
-	Port            int32    `yaml:"port"`
-	ActivityLogPort int32    `yaml:"activityLogPort"`
-	PostPort        int32    `yaml:"postPort"`
-	Db              DBConfig `yaml:"DB"`
-	RabbitMQUrl     string   `yaml:"rabbitmqurl"`
+	AppName        string   `yaml:"appName"`
+	Port           int32    `yaml:"port"`
+	ActivityLogUrl string   `yaml:"activityLogUrl"`
+	PostUrl        string   `yaml:"postUrl"`
+	UserInfoURL    string   `yaml:"userInfoUrl"`
+	Db             DBConfig `yaml:"DB"`
+	RabbitMQUrl    string   `yaml:"rabbitmqurl"`
 }
 
 type DBConfig struct {

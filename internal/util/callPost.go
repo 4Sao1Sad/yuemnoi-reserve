@@ -16,8 +16,7 @@ import (
 
 func connectToPostService() (*grpc.ClientConn, error) {
 	cfg := config.Load()
-	addr := fmt.Sprintf("localhost:%d", cfg.PostPort)
-	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(cfg.PostUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Printf("Failed to connect to PostService: %v", err)
 		return nil, err
