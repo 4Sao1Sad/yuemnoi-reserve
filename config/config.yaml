@@ -8,3 +8,4 @@ DB:
   username: youruser
   password: yourpassword
   database: yourdbname
+rabbitmqurl: amqps://fdnesexk:oATQpfEYx_9QHrQjv1O9WftUaOSvheub@octopus.rmq3.cloudamqp.com/fdnesexk

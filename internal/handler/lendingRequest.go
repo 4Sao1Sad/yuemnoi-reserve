@@ -34,6 +34,16 @@ func (g *LendingRequestGRPC) CreateLendingRequest(ctx context.Context, input *pb
 		Status:          model.Pending,
 		ActiveStatus:    true,
 	}
+	if err := util.ValidatePostExists(nil, input.PostId); err != nil {
+		return nil, err
+	}
+	if err := util.CheckUserExists(uint(input.BorrowingUserId), uint(input.LendingUserId)); err != nil {
+		return nil, err
+	}
+
+	if err := util.CheckPostIsReady(nil, uint64(input.PostId)); err != nil {
+		return nil, err
+	}
 
 	res, err := g.repository.CreateLendingRequest(data)
 	if err != nil {
@@ -76,12 +86,34 @@ func (g *LendingRequestGRPC) GetLendingRequestById(ctx context.Context, input *p
 	return &resp, nil
 }
 
+func (g *LendingRequestGRPC) GetLendingRequests(ctx context.Context, _ *pb.Empty) (*pb.LendingRequestList, error) {
+	requests, err := g.repository.GetLendingRequests()
+	if err != nil {
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+	var resp pb.LendingRequestList
+	for _, request := range requests {
+		resp.LendingRequests = append(resp.LendingRequests, &pb.LendingRequest{
+			Id:              uint64(request.ID),
+			LendingUserId:   uint64(request.LendingUserID),
+			BorrowingUserId: uint64(request.BorrowingUserID),
+			PostId:          uint64(request.PostID),
+			Status:          util.MapModelToProtoStatus(request.Status),
+			ActiveStatus:    request.ActiveStatus,
+		})
+	}
+
+	return &resp, nil
+}
+
 func (g *LendingRequestGRPC) RejectLendingRequest(ctx context.Context, input *pb.RejectLendingRequestInput) (*pb.LendingRequest, error) {
 	req, err := g.repository.GetLendingRequestById(input.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Lending request not found: %v", err)
 	}
-
+	if err := util.ValidateRequest(req.Status, req.ActiveStatus); err != nil {
+		return nil, err
+	}
 	res, err := g.repository.RejectLendingRequest(req)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to reject lending request: %v", err)
@@ -117,7 +149,12 @@ func (g *LendingRequestGRPC) AcceptLendingRequest(ctx context.Context, input *pb
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Lending request not found: %v", err)
 	}
-
+	if err := util.ValidateRequest(req.Status, req.ActiveStatus); err != nil {
+		return nil, err
+	}
+	if err := util.CheckPostIsReady(nil, uint64(req.PostID)); err != nil {
+		return nil, err
+	}
 	res, err := g.repository.AcceptLendingRequest(req)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to accept lending request: %v", err)
@@ -157,7 +194,9 @@ func (g *LendingRequestGRPC) ReturnItemLendingRequest(ctx context.Context, input
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Lending request not found: %v", err)
 	}
-
+	if err := util.ValidateReturnItemRequest(req.Status, req.ActiveStatus); err != nil {
+		return nil, err
+	}
 	res, err := g.repository.ReturnItemLendingRequest(req)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to return item from lending request: %v", err)

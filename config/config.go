@@ -12,6 +12,7 @@ type Config struct {
 	ActivityLogPort int32    `yaml:"activityLogPort"`
 	PostPort        int32    `yaml:"postPort"`
 	Db              DBConfig `yaml:"DB"`
+	RabbitMQUrl     string   `yaml:"rabbitmqurl"`
 }
 
 type DBConfig struct {

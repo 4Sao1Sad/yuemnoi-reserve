@@ -15,6 +15,7 @@ type BorrowingRepository interface {
 	AcceptBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error)
 	RejectBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error)
 	ReturnItemBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error)
+	GetBorrowingRequests() ([]model.BorrowingRequest, error)
 }
 
 func NewBorrowingRepository(db *gorm.DB) *BorrowingRepositoryImpl {
@@ -35,6 +36,14 @@ func (r BorrowingRepositoryImpl) GetBorrowingRequestById(requestId uint) (model.
 	}
 
 	return request, nil
+}
+
+func (r BorrowingRepositoryImpl) GetBorrowingRequests() ([]model.BorrowingRequest, error) {
+	var requests []model.BorrowingRequest
+	if err := r.db.Find(&requests).Error; err != nil {
+		return nil, err
+	}
+	return requests, nil
 }
 
 func (r BorrowingRepositoryImpl) AcceptBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error) {
