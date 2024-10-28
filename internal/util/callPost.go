@@ -24,7 +24,7 @@ func connectToPostService() (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func CallPostService(method string, postID uint64, activeStatus bool) error {
+func CallPostService(method string, postId uint64, activeStatus bool) error {
 	conn, err := connectToPostService()
 	if err != nil {
 		return err
@@ -33,18 +33,18 @@ func CallPostService(method string, postID uint64, activeStatus bool) error {
 
 	switch method {
 	case "BorrowingPost":
-		return updateBorrowingPost(conn, postID, activeStatus)
+		return updateBorrowingPost(conn, postId, activeStatus)
 	case "LendingPost":
-		return updateLendingPost(conn, postID, activeStatus)
+		return updateLendingPost(conn, postId, activeStatus)
 	default:
 		return fmt.Errorf("unknown method: %s", method)
 	}
 }
 
-func updateBorrowingPost(conn *grpc.ClientConn, postID uint64, activeStatus bool) error {
+func updateBorrowingPost(conn *grpc.ClientConn, postId uint64, activeStatus bool) error {
 	client := postpb.NewBorrowingPostServiceClient(conn)
 	req := &postpb.UpdateBorrowingPostRequest{
-		Id:           postID,
+		Id:           postId,
 		ActiveStatus: activeStatus,
 		UpdateMask: &fieldmaskpb.FieldMask{
 			Paths: []string{"active_status"},
@@ -57,10 +57,10 @@ func updateBorrowingPost(conn *grpc.ClientConn, postID uint64, activeStatus bool
 	return nil
 }
 
-func updateLendingPost(conn *grpc.ClientConn, postID uint64, activeStatus bool) error {
+func updateLendingPost(conn *grpc.ClientConn, postId uint64, activeStatus bool) error {
 	client := postpb.NewLendingPostServiceClient(conn)
 	req := &postpb.UpdateLendingPostRequest{
-		Id:           postID,
+		Id:           postId,
 		ActiveStatus: activeStatus,
 		UpdateMask: &fieldmaskpb.FieldMask{
 			Paths: []string{"active_status"},
@@ -73,7 +73,7 @@ func updateLendingPost(conn *grpc.ClientConn, postID uint64, activeStatus bool) 
 	return nil
 }
 
-func GetPost(method string, postID uint64) (interface{}, error) {
+func GetPost(method string, postId uint64) (interface{}, error) {
 	conn, err := connectToPostService()
 	if err != nil {
 		return nil, err
@@ -82,17 +82,17 @@ func GetPost(method string, postID uint64) (interface{}, error) {
 
 	switch method {
 	case "BorrowingPost":
-		return getBorrowingPost(conn, postID)
+		return getBorrowingPost(conn, postId)
 	case "LendingPost":
-		return getLendingPost(conn, postID)
+		return getLendingPost(conn, postId)
 	default:
 		return nil, fmt.Errorf("unknown method: %s", method)
 	}
 }
 
-func getBorrowingPost(conn *grpc.ClientConn, postID uint64) (*postpb.BorrowingPost, error) {
+func getBorrowingPost(conn *grpc.ClientConn, postId uint64) (*postpb.BorrowingPost, error) {
 	client := postpb.NewBorrowingPostServiceClient(conn)
-	req := &postpb.GetBorrowingPostDetailRequest{Id: postID}
+	req := &postpb.GetBorrowingPostDetailRequest{Id: postId}
 	res, err := client.GetBorrowingPostDetail(context.Background(), req)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "borrowing post id not found: %v", err)
@@ -100,9 +100,9 @@ func getBorrowingPost(conn *grpc.ClientConn, postID uint64) (*postpb.BorrowingPo
 	return res, nil
 }
 
-func getLendingPost(conn *grpc.ClientConn, postID uint64) (*postpb.LendingPost, error) {
+func getLendingPost(conn *grpc.ClientConn, postId uint64) (*postpb.LendingPost, error) {
 	client := postpb.NewLendingPostServiceClient(conn)
-	req := &postpb.GetLendingPostDetailRequest{Id: postID}
+	req := &postpb.GetLendingPostDetailRequest{Id: postId}
 	res, err := client.GetLendingPostDetail(context.Background(), req)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "lending post id not found: %v", err)
@@ -110,21 +110,21 @@ func getLendingPost(conn *grpc.ClientConn, postID uint64) (*postpb.LendingPost, 
 	return res, nil
 }
 
-func ValidatePostExists(borrowingPostID *uint64, lendingPostID uint64) error {
-	if borrowingPostID != nil {
-		if _, err := GetPost("BorrowingPost", *borrowingPostID); err != nil {
-			return status.Errorf(codes.NotFound, "Borrowing post with ID %d does not exist", *borrowingPostID)
+func ValidatePostExists(borrowingPostId *uint64, lendingPostId uint64) error {
+	if borrowingPostId != nil {
+		if _, err := GetPost("BorrowingPost", *borrowingPostId); err != nil {
+			return status.Errorf(codes.NotFound, "Borrowing post with Id %d does not exist", *borrowingPostId)
 		}
 	}
-	if _, err := GetPost("LendingPost", lendingPostID); err != nil {
-		return status.Errorf(codes.NotFound, "Lending post with ID %d does not exist", lendingPostID)
+	if _, err := GetPost("LendingPost", lendingPostId); err != nil {
+		return status.Errorf(codes.NotFound, "Lending post with Id %d does not exist", lendingPostId)
 	}
 	return nil
 }
 
-func CheckPostIsReady(borrowingPostID *uint64, lendingPostID uint64) error {
-	if borrowingPostID != nil {
-		postData, err := GetPost("BorrowingPost", *borrowingPostID)
+func CheckPostIsReady(borrowingPostId *uint64, lendingPostId uint64) error {
+	if borrowingPostId != nil {
+		postData, err := GetPost("BorrowingPost", *borrowingPostId)
 		if err != nil {
 			return status.Errorf(codes.NotFound, "Borrowing post not found: %v", err)
 		}
@@ -136,7 +136,7 @@ func CheckPostIsReady(borrowingPostID *uint64, lendingPostID uint64) error {
 			return status.Errorf(codes.FailedPrecondition, "Borrowing post is not active")
 		}
 	}
-	postData, err := GetPost("LendingPost", lendingPostID)
+	postData, err := GetPost("LendingPost", lendingPostId)
 	if err != nil {
 		return status.Errorf(codes.NotFound, "Lending post not found: %v", err)
 	}

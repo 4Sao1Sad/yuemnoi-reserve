@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func CallActivityLogService(userID uint64, logDetail string) error {
+func CallActivityLogService(userId uint64, logDetail string) error {
 	cfg := config.Load()
 	conn, err := grpc.NewClient(cfg.ActivityLogUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -23,7 +23,7 @@ func CallActivityLogService(userID uint64, logDetail string) error {
 
 	req := &activitypb.CreateActivityLogRequest{
 		LogDetail: logDetail,
-		UserId:    userID,
+		UserId:    userId,
 	}
 
 	_, err = client.CreateActivityLog(context.Background(), req)
