@@ -36,6 +36,18 @@ func (h *BorrowingGRPC) CreateBorrowingRequest(ctx context.Context, input *pb.Cr
 		Status:          model.Pending,
 		ActiveStatus:    true,
 	}
+	if err := util.ValidatePostExists(&input.BorrowingPostId, input.LendingPostId); err != nil {
+		return nil, err
+	}
+
+	if err := util.CheckUserExists(uint(input.BorrowingUserId), uint(input.LendingUserId)); err != nil {
+		return nil, err
+	}
+
+	if err := util.CheckPostIsReady(&input.BorrowingPostId, input.LendingPostId); err != nil {
+		return nil, err
+	}
+
 	res, err := h.repository.CreateBorrowingRequest(data)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to create borrowing request: %v", err)
@@ -46,7 +58,7 @@ func (h *BorrowingGRPC) CreateBorrowingRequest(ctx context.Context, input *pb.Cr
 	if errLog != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to log activity: %v", errLog)
 	}
-	
+
 	requestFromBorrowingNoti := dto.NotificationRequest{
 		Message: "You get a new offer, please check your Request list.",
 		UserIds: []int{int(input.BorrowingUserId)},
@@ -78,12 +90,37 @@ func (h *BorrowingGRPC) GetBorrowingRequestById(ctx context.Context, input *pb.G
 	return &response, nil
 }
 
+func (h *BorrowingGRPC) GetBorrowingRequests(ctx context.Context, _ *pb.Empty) (*pb.BorrowingRequestList, error) {
+	requests, err := h.repository.GetBorrowingRequests()
+	if err != nil {
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+	var resp pb.BorrowingRequestList
+	for _, request := range requests {
+		resp.BorrowingRequests = append(resp.BorrowingRequests, &pb.BorrowingRequest{
+			Id:              uint64(request.ID),
+			LendingUserId:   uint64(request.LendingUserID),
+			BorrowingUserId: uint64(request.BorrowingUserID),
+			LendingPostId:   uint64(request.LendingPostID),
+			BorrowingPostId: uint64(request.BorrowingPostID),
+			Status:          util.MapModelToProtoStatus(request.Status),
+			ActiveStatus:    request.ActiveStatus,
+		})
+	}
+	return &resp, nil
+}
+
 func (h *BorrowingGRPC) AcceptBorrowingRequest(ctx context.Context, input *pb.AcceptBorrowingRequestInput) (*pb.BorrowingRequest, error) {
 	req, err := h.repository.GetBorrowingRequestById(uint(input.Id))
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Borrowing request not found: %v", err)
 	}
-
+	if err := util.ValidateRequest(req.Status, req.ActiveStatus); err != nil {
+		return nil, err
+	}
+	if err := util.CheckPostIsReady(nil, uint64(req.LendingPostID)); err != nil {
+		return nil, err
+	}
 	res, err := h.repository.AcceptBorrowingRequest(req)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to Accept borrowing request: %v", err)
@@ -129,7 +166,9 @@ func (h *BorrowingGRPC) RejectBorrowingRequest(ctx context.Context, input *pb.Re
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Borrowing request not found: %v", err)
 	}
-
+	if err := util.ValidateRequest(req.Status, req.ActiveStatus); err != nil {
+		return nil, err
+	}
 	res, err := h.repository.RejectBorrowingRequest(req)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to reject borrowing request: %v", err)
@@ -164,7 +203,9 @@ func (h *BorrowingGRPC) ReturnItemBorrowingRequest(ctx context.Context, input *p
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Borrowing request not found: %v", err)
 	}
-
+	if err := util.ValidateReturnItemRequest(req.Status, req.ActiveStatus); err != nil {
+		return nil, err
+	}
 	res, err := h.repository.ReturnItemBorrowingRequest(req)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to return item from borrowing request: %v", err)

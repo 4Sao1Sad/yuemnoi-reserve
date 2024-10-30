@@ -31,13 +31,43 @@ message UpdateBorrowingPostRequest {
 message UpdateBorrowingPostResponse {
     string message = 1;       
 }
+// Request message for fetching LendingPost details
+message GetLendingPostDetailRequest {
+    uint64 id = 1;
+}
+
+message LendingPost {
+    uint64 id = 1;           
+    string item_name = 2;     
+    string description = 3;   
+    double price = 4;         
+    bool active_status = 5;   
+    string image_url = 6;     
+    uint64 owner_id = 7;      
+    google.protobuf.Timestamp updated_at = 8;  
+}
+
+// LendingPost message representing the structure of the BorrowingPost object
+message BorrowingPost {
+    uint64 id = 1;
+    string description = 2;     // Required field
+    bool active_status = 3;     // Required field, booleanepeated LendingPost item_list = 4; // List of BorrowingPost
+    uint64 owner_id = 4;        // Required field       
+    google.protobuf.Timestamp updated_at = 5; 
+  }
+
+message GetBorrowingPostDetailRequest {
+    uint64 id = 1;
+}
 
 service BorrowingPostService {
 // RPC method to create a new BorrowingPost
     rpc UpdateBorrowingPost(UpdateBorrowingPostRequest) returns (UpdateBorrowingPostResponse){}
+    rpc GetBorrowingPostDetail(GetBorrowingPostDetailRequest) returns (BorrowingPost) {}
 }
 
 // LendingPostService definition
 service LendingPostService {
     rpc UpdateLendingPost(UpdateLendingPostRequest) returns (UpdateLendingPostResponse){}
+    rpc GetLendingPostDetail(GetLendingPostDetailRequest) returns (LendingPost) {}
 }

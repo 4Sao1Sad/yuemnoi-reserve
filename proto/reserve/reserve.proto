@@ -43,13 +43,17 @@ message RejectBorrowingRequestInput  {
 message ReturnItemBorrowingRequestInput {
     uint64 id = 1;
 }
-
+message BorrowingRequestList {
+    repeated BorrowingRequest borrowing_requests = 1; 
+}
+message Empty {}
 service BorrowingService {
     rpc CreateBorrowingRequest(CreateBorrowingRequestInput) returns (CreateBorrowingRequestResponse);
     rpc GetBorrowingRequestById(GetBorrowingRequestInput) returns (BorrowingRequest);
     rpc AcceptBorrowingRequest (AcceptBorrowingRequestInput) returns (BorrowingRequest);
     rpc RejectBorrowingRequest(RejectBorrowingRequestInput ) returns (BorrowingRequest);
     rpc ReturnItemBorrowingRequest(ReturnItemBorrowingRequestInput) returns (BorrowingRequest);
+    rpc GetBorrowingRequests(Empty) returns (BorrowingRequestList);
 }
 
 // The reserve message representing the structure of the Reserve object
@@ -59,7 +63,7 @@ message LendingRequest {
     uint64 borrowing_user_id = 3;
     uint64 post_id = 4;   
     RequestStatus status = 5;
-    bool activeStatus = 6;
+    bool active_status = 6;
 }
 
 // Request message for creating a new Reserve
@@ -90,11 +94,14 @@ message AcceptLendingRequestInput {
 message ReturnItemLendingRequestInput {
     uint64 id = 1;
 }
-
+message LendingRequestList {
+    repeated LendingRequest lending_requests = 1;
+}
 service ReserveService {
-    rpc CreateLendingRequest(CreateLendingRequestInput) returns (CreateLendingRequestResponse) {}
-    rpc GetLendingRequestById(GetLendingRequestInput) returns (LendingRequest) {}
-    rpc RejectLendingRequest(RejectLendingRequestInput) returns (LendingRequest) {}
-    rpc AcceptLendingRequest(AcceptLendingRequestInput) returns (LendingRequest) {}
-    rpc ReturnItemLendingRequest(ReturnItemLendingRequestInput) returns (LendingRequest) {}
+    rpc CreateLendingRequest(CreateLendingRequestInput) returns (CreateLendingRequestResponse);
+    rpc GetLendingRequestById(GetLendingRequestInput) returns (LendingRequest);
+    rpc RejectLendingRequest(RejectLendingRequestInput) returns (LendingRequest);
+    rpc AcceptLendingRequest(AcceptLendingRequestInput) returns (LendingRequest);
+    rpc ReturnItemLendingRequest(ReturnItemLendingRequestInput) returns (LendingRequest);
+    rpc GetLendingRequests(Empty) returns (LendingRequestList);
 }
