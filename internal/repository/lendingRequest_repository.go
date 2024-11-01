@@ -29,7 +29,7 @@ type LendingRequestRepository interface {
 
 func (r LendingRequestRepositoryImpl) GetMyLendingRequests(userId uint) ([]model.LendingRequest, error) {
 	var requests []model.LendingRequest
-	if err := r.db.Where("lending_user_id = ?", userId).Find(&requests).Error; err != nil {
+	if err := r.db.Where("lending_user_id = ? AND status = ?", userId, model.Pending).Find(&requests).Error; err != nil {
 		return nil, err
 	}
 	return requests, nil
@@ -37,7 +37,7 @@ func (r LendingRequestRepositoryImpl) GetMyLendingRequests(userId uint) ([]model
 
 func (r LendingRequestRepositoryImpl) GetMyBorrowingPosts(userId uint) ([]model.LendingRequest, error) {
 	var requests []model.LendingRequest
-	if err := r.db.Where("borrowing_user_id = ?", userId).Find(&requests).Error; err != nil {
+	if err := r.db.Where("borrowing_user_id = ? AND status = ?", userId, model.Pending).Find(&requests).Error; err != nil {
 		return nil, err
 	}
 	return requests, nil
