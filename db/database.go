@@ -3,14 +3,15 @@ package db
 import (
 	"fmt"
 	"log"
-	"net"
+	"strconv"
 
 	"github.com/KKhimmoon/yuemnoi-reserve/config"
-	"github.com/KKhimmoon/yuemnoi-reserve/internal/handler"
+	handler "github.com/KKhimmoon/yuemnoi-reserve/internal/handler"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/model"
 	"github.com/KKhimmoon/yuemnoi-reserve/internal/repository"
-	reserve "github.com/KKhimmoon/yuemnoi-reserve/proto/reserve"
-	"google.golang.org/grpc"
+	"github.com/KKhimmoon/yuemnoi-reserve/internal/route"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -33,32 +34,29 @@ func Migration(db *gorm.DB) {
 }
 
 func ServerInit(cfg *config.Config, db *gorm.DB) error {
-	listen, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Port))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+	// Initialize Fiber app
+	app := fiber.New()
+	app.Use(requestid.New())
+
+	// Initialize repositories
+	borrowingRequestRepository := repository.NewBorrowingRequestRepository(db)
+	lendingRequestRepository := repository.NewLendingRequestRepository(db)
+
+	// Initialize handlers
+	borrowingRequestRestHandler := handler.NewBorrowingRequestRestHandler(borrowingRequestRepository)
+	lendingRequestRestHandler := handler.NewLendingRequestRestHandler(lendingRequestRepository)
+	requestRestHandler := handler.NewRequestRestHandler(borrowingRequestRepository, lendingRequestRepository)
+
+	// Register routes
+	r := route.NewHandler(borrowingRequestRestHandler, lendingRequestRestHandler, requestRestHandler)
+	r.RegisterRouter(app, cfg)
+
+	// Start the server with error handling
+	port := strconv.Itoa(int(cfg.Port))
+	if err := app.Listen(cfg.Host + ":" + port); err != nil {
+		log.Fatalf("failed to start server: %v", err)
+		return err
 	}
-	defer func() {
-		listen.Close()
-	}()
 
-	fmt.Printf("Go gRPC server on port %v!\n", cfg.Port)
-	grpcServer := grpc.NewServer()
-
-	//repository
-	LendingRepository := repository.NewLendingRequestRepository(db)
-	BorrowingRepository := repository.NewBorrowingRepository(db)
-
-	//gRPC handler
-	BorrowingServer := handler.NewBorrowingGRPC(BorrowingRepository)
-	LendingServer := handler.NewLendingRequestGRPC(LendingRepository)
-
-	// Register service with the gRPC server
-	reserve.RegisterReserveServiceServer(grpcServer, LendingServer)
-	reserve.RegisterBorrowingServiceServer(grpcServer, BorrowingServer)
-
-	err = grpcServer.Serve(listen)
-	if err != nil {
-		return fmt.Errorf("error to serve: %v", err)
-	}
 	return nil
 }

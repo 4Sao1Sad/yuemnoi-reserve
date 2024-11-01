@@ -5,31 +5,52 @@ import (
 	"gorm.io/gorm"
 )
 
-type BorrowingRepositoryImpl struct {
+type BorrowingRequestRepositoryImpl struct {
 	db *gorm.DB
 }
 
-type BorrowingRepository interface {
-	CreateBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error)
-	GetBorrowingRequestById(requestId uint) (model.BorrowingRequest, error)
+func NewBorrowingRequestRepository(db *gorm.DB) *BorrowingRequestRepositoryImpl {
+	return &BorrowingRequestRepositoryImpl{
+		db: db,
+	}
+}
+
+type BorrowingRequestRepository interface {
+	GetMyBorrowingRequests(userId uint) ([]model.BorrowingRequest, error)
+	GetMyLendingPosts(userId uint) ([]model.BorrowingRequest, error)
 	AcceptBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error)
+	GetBorrowingRequestById(requestId uint) (model.BorrowingRequest, error)
 	RejectBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error)
+	CreateBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error)
 	ReturnItemBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error)
-	GetBorrowingRequests() ([]model.BorrowingRequest, error)
+	GetMyActiveBorrowingRequests(userId uint) ([]model.BorrowingRequest, error)
+	GetMyHistorryBorrowingRequests(userId uint) ([]model.BorrowingRequest, error)
 }
 
-func NewBorrowingRepository(db *gorm.DB) *BorrowingRepositoryImpl {
-	return &BorrowingRepositoryImpl{db: db}
+func (r BorrowingRequestRepositoryImpl) GetMyBorrowingRequests(userId uint) ([]model.BorrowingRequest, error) {
+	var requests []model.BorrowingRequest
+	if err := r.db.Where("borrowing_user_id = ?", userId).Find(&requests).Error; err != nil {
+		return nil, err
+	}
+	return requests, nil
 }
 
-func (r BorrowingRepositoryImpl) CreateBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error) {
-	if err := r.db.Create(&request).Error; err != nil {
+func (r BorrowingRequestRepositoryImpl) GetMyLendingPosts(userId uint) ([]model.BorrowingRequest, error) {
+	var requests []model.BorrowingRequest
+	if err := r.db.Where("lending_user_id = ?", userId).Find(&requests).Error; err != nil {
+		return nil, err
+	}
+	return requests, nil
+}
+
+func (r BorrowingRequestRepositoryImpl) AcceptBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error) {
+	if err := r.db.Model(&request).Update("status", model.Accepted).Error; err != nil {
 		return model.BorrowingRequest{}, err
 	}
 	return request, nil
 }
 
-func (r BorrowingRepositoryImpl) GetBorrowingRequestById(requestId uint) (model.BorrowingRequest, error) {
+func (r BorrowingRequestRepositoryImpl) GetBorrowingRequestById(requestId uint) (model.BorrowingRequest, error) {
 	var request model.BorrowingRequest
 	if err := r.db.Where("id = ?", requestId).First(&request).Error; err != nil {
 		return model.BorrowingRequest{}, err
@@ -38,22 +59,7 @@ func (r BorrowingRepositoryImpl) GetBorrowingRequestById(requestId uint) (model.
 	return request, nil
 }
 
-func (r BorrowingRepositoryImpl) GetBorrowingRequests() ([]model.BorrowingRequest, error) {
-	var requests []model.BorrowingRequest
-	if err := r.db.Find(&requests).Error; err != nil {
-		return nil, err
-	}
-	return requests, nil
-}
-
-func (r BorrowingRepositoryImpl) AcceptBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error) {
-	if err := r.db.Model(&request).Update("status", model.Accepted).Error; err != nil {
-		return model.BorrowingRequest{}, err
-	}
-	return request, nil
-}
-
-func (r BorrowingRepositoryImpl) RejectBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error) {
+func (r BorrowingRequestRepositoryImpl) RejectBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error) {
 	if err := r.db.Model(&request).Updates(map[string]interface{}{
 		"status":        model.Rejected,
 		"active_status": false,
@@ -63,9 +69,34 @@ func (r BorrowingRepositoryImpl) RejectBorrowingRequest(request model.BorrowingR
 	return request, nil
 }
 
-func (r BorrowingRepositoryImpl) ReturnItemBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error) {
+func (r BorrowingRequestRepositoryImpl) CreateBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error) {
+	if err := r.db.Create(&request).Error; err != nil {
+		return model.BorrowingRequest{}, err
+	}
+	return request, nil
+}
+
+func (r BorrowingRequestRepositoryImpl) ReturnItemBorrowingRequest(request model.BorrowingRequest) (model.BorrowingRequest, error) {
 	if err := r.db.Model(&request).Update("active_status", false).Error; err != nil {
 		return model.BorrowingRequest{}, err
 	}
 	return request, nil
+}
+
+func (r BorrowingRequestRepositoryImpl) GetMyActiveBorrowingRequests(userId uint) ([]model.BorrowingRequest, error) {
+	var requests []model.BorrowingRequest
+	if err := r.db.Where("(lending_user_id = ? OR borrowing_user_id = ?) AND status = ? AND active_status = ?",
+		userId, userId, model.Accepted, true).Find(&requests).Order("updated_at DESC").Error; err != nil {
+		return nil, err
+	}
+	return requests, nil
+}
+
+func (r BorrowingRequestRepositoryImpl) GetMyHistorryBorrowingRequests(userId uint) ([]model.BorrowingRequest, error) {
+	var requests []model.BorrowingRequest
+	if err := r.db.Where("(lending_user_id = ? OR borrowing_user_id = ?) AND active_status = ?",
+		userId, userId, false).Find(&requests).Order("updated_at DESC").Error; err != nil {
+		return nil, err
+	}
+	return requests, nil
 }

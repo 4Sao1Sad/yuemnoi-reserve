@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/KKhimmoon/yuemnoi-reserve/dto"
+	"github.com/KKhimmoon/yuemnoi-reserve/internal/dto"
 
 	"github.com/KKhimmoon/yuemnoi-reserve/config"
 

@@ -24,7 +24,7 @@ func connectToPostService() (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
-func CallPostService(method string, postId uint64, activeStatus bool) error {
+func UpdatePostService(method string, postId uint64, activeStatus bool) error {
 	conn, err := connectToPostService()
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func updateBorrowingPost(conn *grpc.ClientConn, postId uint64, activeStatus bool
 	}
 	_, err := client.UpdateBorrowingPost(context.Background(), req)
 	if err != nil {
-		return status.Errorf(codes.Internal, "error updating borrowing post: %v", err)
+		return fmt.Errorf("error updating borrowing post: %v", err)
 	}
 	return nil
 }
@@ -68,7 +68,7 @@ func updateLendingPost(conn *grpc.ClientConn, postId uint64, activeStatus bool) 
 	}
 	_, err := client.UpdateLendingPost(context.Background(), req)
 	if err != nil {
-		return status.Errorf(codes.Internal, "error updating lending post: %v", err)
+		return fmt.Errorf("error updating lending post: %v", err)
 	}
 	return nil
 }
@@ -95,7 +95,7 @@ func getBorrowingPost(conn *grpc.ClientConn, postId uint64) (*postpb.BorrowingPo
 	req := &postpb.GetBorrowingPostDetailRequest{Id: postId}
 	res, err := client.GetBorrowingPostDetail(context.Background(), req)
 	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "borrowing post id not found: %v", err)
+		return nil, fmt.Errorf("borrowing post id not found: %v", err)
 	}
 	return res, nil
 }
@@ -105,7 +105,7 @@ func getLendingPost(conn *grpc.ClientConn, postId uint64) (*postpb.LendingPost, 
 	req := &postpb.GetLendingPostDetailRequest{Id: postId}
 	res, err := client.GetLendingPostDetail(context.Background(), req)
 	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "lending post id not found: %v", err)
+		return nil, fmt.Errorf("lending post id not found: %v", err)
 	}
 	return res, nil
 }
@@ -113,11 +113,11 @@ func getLendingPost(conn *grpc.ClientConn, postId uint64) (*postpb.LendingPost, 
 func ValidatePostExists(borrowingPostId *uint64, lendingPostId uint64) error {
 	if borrowingPostId != nil {
 		if _, err := GetPost("BorrowingPost", *borrowingPostId); err != nil {
-			return status.Errorf(codes.NotFound, "Borrowing post with Id %d does not exist", *borrowingPostId)
+			return fmt.Errorf("borrowing post with Id %d does not exist", *borrowingPostId)
 		}
 	}
 	if _, err := GetPost("LendingPost", lendingPostId); err != nil {
-		return status.Errorf(codes.NotFound, "Lending post with Id %d does not exist", lendingPostId)
+		return fmt.Errorf("lending post with Id %d does not exist", lendingPostId)
 	}
 	return nil
 }
@@ -126,14 +126,11 @@ func CheckPostIsReady(borrowingPostId *uint64, lendingPostId uint64) error {
 	if borrowingPostId != nil {
 		postData, err := GetPost("BorrowingPost", *borrowingPostId)
 		if err != nil {
-			return status.Errorf(codes.NotFound, "Borrowing post not found: %v", err)
+			return fmt.Errorf("borrowing post not found: %v", err)
 		}
 		borrowingPost, ok := postData.(*postpb.BorrowingPost)
-		if !ok {
-			return status.Errorf(codes.Internal, "Unexpected data format for BorrowingPost")
-		}
-		if !borrowingPost.ActiveStatus {
-			return status.Errorf(codes.FailedPrecondition, "Borrowing post is not active")
+		if !ok || !borrowingPost.ActiveStatus {
+			return fmt.Errorf("borrowing post is not active or in incorrect format")
 		}
 	}
 	postData, err := GetPost("LendingPost", lendingPostId)
@@ -141,11 +138,38 @@ func CheckPostIsReady(borrowingPostId *uint64, lendingPostId uint64) error {
 		return status.Errorf(codes.NotFound, "Lending post not found: %v", err)
 	}
 	lendingPost, ok := postData.(*postpb.LendingPost)
-	if !ok {
-		return status.Errorf(codes.Internal, "Unexpected data format for LendingPost")
-	}
-	if !lendingPost.ActiveStatus {
-		return status.Errorf(codes.FailedPrecondition, "Lending post is not ready")
+	if !ok || !lendingPost.ActiveStatus {
+		return fmt.Errorf("lending post is not ready or in incorrect format")
 	}
 	return nil
+}
+
+func GetBorrowingPostsByIds(ids []uint64) (*postpb.BorrowingPostList, error) {
+	conn, err := connectToPostService()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := postpb.NewBorrowingPostServiceClient(conn)
+	req := &postpb.GetBorrowingPostsByIdsRequest{Ids: ids}
+	res, err := client.GetBorrowiingPostsByIds(context.Background(), req)
+	if err != nil {
+		return nil, fmt.Errorf("can not retrieve borrowing posts %v", err)
+	}
+	return res, nil
+}
+
+func GetLendingPostsByIds(ids []uint64) (*postpb.LendingPostList, error) {
+	conn, err := connectToPostService()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := postpb.NewLendingPostServiceClient(conn)
+	req := &postpb.GetLendingPostsByIdsRequest{Ids: ids}
+	res, err := client.GetLendingPostsByIds(context.Background(), req)
+	if err != nil {
+		return nil, fmt.Errorf("can not retrieve borrowing posts %v", err)
+	}
+	return res, nil
 }

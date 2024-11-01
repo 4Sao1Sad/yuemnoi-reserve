@@ -9,6 +9,7 @@ import (
 type Config struct {
 	AppName        string   `yaml:"appName"`
 	Port           int32    `yaml:"port"`
+	Host           string   `yaml:"host"`
 	ActivityLogUrl string   `yaml:"activityLogUrl"`
 	PostUrl        string   `yaml:"postUrl"`
 	UserInfoURL    string   `yaml:"userInfoUrl"`
