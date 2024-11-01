@@ -68,6 +68,7 @@ func (h *RequestRestHandler) GetMyActiveRequest(c *fiber.Ctx) error {
 			role = "lender"
 		}
 		response = append(response, dto.ActiveRequestResponse{
+			RequestType:     dto.BorrowingRequest,
 			ID:              request.ID,
 			BorrowingUserID: request.BorrowingUserID,
 			LendingUserID:   request.LendingUserID,
@@ -94,6 +95,7 @@ func (h *RequestRestHandler) GetMyActiveRequest(c *fiber.Ctx) error {
 			role = "borrower"
 		}
 		response = append(response, dto.ActiveRequestResponse{
+			RequestType:     dto.LendingRequest,
 			ID:              request.ID,
 			BorrowingUserID: request.BorrowingUserID,
 			LendingUserID:   request.LendingUserID,
@@ -149,6 +151,7 @@ func (h *RequestRestHandler) GetMyHistoryRequest(c *fiber.Ctx) error {
 	for i, request := range borrowingReqs {
 		isReject := request.Status == model.Rejected
 		response = append(response, dto.HistoryRequestResponse{
+			RequestType:     dto.BorrowingRequest,
 			ID:              request.ID,
 			BorrowingUserID: request.BorrowingUserID,
 			LendingUserID:   request.LendingUserID,
@@ -171,6 +174,7 @@ func (h *RequestRestHandler) GetMyHistoryRequest(c *fiber.Ctx) error {
 	for i, request := range lendingReqs {
 		isReject := request.Status == model.Rejected
 		response = append(response, dto.HistoryRequestResponse{
+			RequestType:     dto.LendingRequest,
 			ID:              request.ID,
 			BorrowingUserID: request.BorrowingUserID,
 			LendingUserID:   request.LendingUserID,

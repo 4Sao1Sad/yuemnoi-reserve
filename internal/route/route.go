@@ -27,7 +27,7 @@ func (h *Handler) RegisterRouter(r fiber.Router, cfg *config.Config) {
 		borrowingRequestRouter.Get("/my-lending-posts", h.borrowingRequestRestHandler.GetMyLendingPosts)
 		borrowingRequestRouter.Post("/accept/:requestId", h.borrowingRequestRestHandler.AcceptBorrowingRequest)
 		borrowingRequestRouter.Post("/reject/:requestId", h.borrowingRequestRestHandler.RejectBorrowingRequest)
-		borrowingRequestRouter.Post("return/:requestId", h.borrowingRequestRestHandler.ReturnItemBorrowingRequest)
+		borrowingRequestRouter.Post("/return/:requestId", h.borrowingRequestRestHandler.ReturnItemBorrowingRequest)
 		borrowingRequestRouter.Post("/", h.borrowingRequestRestHandler.CreateBorrowingRequest)
 	}
 	{
@@ -36,11 +36,11 @@ func (h *Handler) RegisterRouter(r fiber.Router, cfg *config.Config) {
 		lendingRequestRouter.Get("/my-borrowing-posts", h.lendingRequestRestHandler.GetMyBorrowingPosts)
 		lendingRequestRouter.Post("/accept/:requestId", h.lendingRequestRestHandler.AcceptLendingRequest)
 		lendingRequestRouter.Post("/reject/:requestId", h.lendingRequestRestHandler.RejectLendingRequest)
-		lendingRequestRouter.Post("return/:requestId", h.lendingRequestRestHandler.ReturnItemLendingRequest)
-		lendingRequestRouter.Post("/", h.lendingRequestRestHandler.ReturnItemLendingRequest)
+		lendingRequestRouter.Post("/return/:requestId", h.lendingRequestRestHandler.ReturnItemLendingRequest)
+		lendingRequestRouter.Post("/", h.lendingRequestRestHandler.CreateLendingRequest)
 	}
 	{
-		r.Get("/active-request", h.requestRestHandler.GetMyActiveRequest)
-		r.Get("/history-request", h.requestRestHandler.GetMyHistoryRequest)
+		r.Get("/active-requests", h.requestRestHandler.GetMyActiveRequest)
+		r.Get("/history-requests", h.requestRestHandler.GetMyHistoryRequest)
 	}
 }

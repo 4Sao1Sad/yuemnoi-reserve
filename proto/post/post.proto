@@ -97,5 +97,5 @@ service BorrowingPostService {
 // RPC method to create a new BorrowingPost
     rpc UpdateBorrowingPost(UpdateBorrowingPostRequest) returns (UpdateBorrowingPostResponse){}
     rpc GetBorrowingPostDetail(GetBorrowingPostDetailRequest) returns (BorrowingPost) {}
-    rpc GetBorrowiingPostsByIds(GetBorrowingPostsByIdsRequest) returns (BorrowingPostList) {}
+    rpc GetBorrowingPostsByIds(GetBorrowingPostsByIdsRequest) returns (BorrowingPostList) {}
 }

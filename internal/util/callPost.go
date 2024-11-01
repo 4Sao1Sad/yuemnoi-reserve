@@ -152,7 +152,7 @@ func GetBorrowingPostsByIds(ids []uint64) (*postpb.BorrowingPostList, error) {
 	defer conn.Close()
 	client := postpb.NewBorrowingPostServiceClient(conn)
 	req := &postpb.GetBorrowingPostsByIdsRequest{Ids: ids}
-	res, err := client.GetBorrowiingPostsByIds(context.Background(), req)
+	res, err := client.GetBorrowingPostsByIds(context.Background(), req)
 	if err != nil {
 		return nil, fmt.Errorf("can not retrieve borrowing posts %v", err)
 	}
@@ -169,7 +169,7 @@ func GetLendingPostsByIds(ids []uint64) (*postpb.LendingPostList, error) {
 	req := &postpb.GetLendingPostsByIdsRequest{Ids: ids}
 	res, err := client.GetLendingPostsByIds(context.Background(), req)
 	if err != nil {
-		return nil, fmt.Errorf("can not retrieve borrowing posts %v", err)
+		return nil, fmt.Errorf("can not retrieve lending posts %v", err)
 	}
 	return res, nil
 }

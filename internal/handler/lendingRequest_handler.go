@@ -138,7 +138,7 @@ func (h *LendingRequestRestHandler) GetMyLendingRequests(c *fiber.Ctx) error {
 	borrowingPosts, err := util.GetBorrowingPostsByIds(borrowingPostids)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Unable to retrieve lending posts",
+			"error": "Unable to retrieve borrowing posts",
 		})
 	}
 	var response []dto.GetMyLendingRequestsResponse
