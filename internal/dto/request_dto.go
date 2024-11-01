@@ -15,6 +15,7 @@ type ActiveRequestResponse struct {
 	PostID          uint        `json:"post_id"`
 	Role            string      `json:"role"`
 	Post            interface{} `json:"post"`
+	Borrower        string      `json:"borrower"`
 }
 
 type HistoryRequestResponse struct {
@@ -25,4 +26,5 @@ type HistoryRequestResponse struct {
 	PostID          uint        `json:"post_id"`
 	IsReject        bool        `json:"is_reject"`
 	Post            interface{} `json:"post"`
+	Borrower        string      `json:"borrower"`
 }

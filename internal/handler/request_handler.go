@@ -67,6 +67,12 @@ func (h *RequestRestHandler) GetMyActiveRequest(c *fiber.Ctx) error {
 		if request.LendingUserID == uint(userId) {
 			role = "lender"
 		}
+		name, err := util.GetUserById(uint(request.BorrowingUserID))
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Unable retrieve user name",
+			})
+		}
 		response = append(response, dto.ActiveRequestResponse{
 			RequestType:     dto.BorrowingRequest,
 			ID:              request.ID,
@@ -75,6 +81,7 @@ func (h *RequestRestHandler) GetMyActiveRequest(c *fiber.Ctx) error {
 			PostID:          request.PostID,
 			Role:            role,
 			Post:            lendingPosts.Posts[i],
+			Borrower:        name,
 		})
 	}
 
@@ -94,6 +101,12 @@ func (h *RequestRestHandler) GetMyActiveRequest(c *fiber.Ctx) error {
 		if request.BorrowingUserID == uint(userId) {
 			role = "borrower"
 		}
+		name, err := util.GetUserById(uint(request.BorrowingUserID))
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Unable retrieve user name",
+			})
+		}
 		response = append(response, dto.ActiveRequestResponse{
 			RequestType:     dto.LendingRequest,
 			ID:              request.ID,
@@ -102,6 +115,7 @@ func (h *RequestRestHandler) GetMyActiveRequest(c *fiber.Ctx) error {
 			PostID:          request.LendingPostID,
 			Role:            role,
 			Post:            lendingPosts.Posts[i],
+			Borrower:        name,
 		})
 	}
 
@@ -150,6 +164,12 @@ func (h *RequestRestHandler) GetMyHistoryRequest(c *fiber.Ctx) error {
 	var response []dto.HistoryRequestResponse
 	for i, request := range borrowingReqs {
 		isReject := request.Status == model.Rejected
+		name, err := util.GetUserById(uint(request.BorrowingUserID))
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Unable retrieve user name",
+			})
+		}
 		response = append(response, dto.HistoryRequestResponse{
 			RequestType:     dto.BorrowingRequest,
 			ID:              request.ID,
@@ -158,6 +178,7 @@ func (h *RequestRestHandler) GetMyHistoryRequest(c *fiber.Ctx) error {
 			PostID:          request.PostID,
 			IsReject:        isReject,
 			Post:            lendingPosts.Posts[i],
+			Borrower:        name,
 		})
 	}
 	var requestIdsLendingReq []uint64
@@ -173,6 +194,12 @@ func (h *RequestRestHandler) GetMyHistoryRequest(c *fiber.Ctx) error {
 	}
 	for i, request := range lendingReqs {
 		isReject := request.Status == model.Rejected
+		name, err := util.GetUserById(uint(request.BorrowingUserID))
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Unable retrieve user name",
+			})
+		}
 		response = append(response, dto.HistoryRequestResponse{
 			RequestType:     dto.LendingRequest,
 			ID:              request.ID,
@@ -181,6 +208,7 @@ func (h *RequestRestHandler) GetMyHistoryRequest(c *fiber.Ctx) error {
 			PostID:          request.LendingPostID,
 			IsReject:        isReject,
 			Post:            lendingPosts.Posts[i],
+			Borrower:        name,
 		})
 	}
 
