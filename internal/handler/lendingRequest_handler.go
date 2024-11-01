@@ -79,7 +79,7 @@ func (h *LendingRequestRestHandler) CreateLendingRequest(c *fiber.Ctx) error {
 			"error": "Unable to create Lending request",
 		})
 	}
-	PostId := strconv.FormatUint(uint64(request.BorrowingUserID), 10)
+	PostId := strconv.FormatUint(uint64(request.BorrowingPostID), 10)
 	logDetail := "Reservation Service: [success] Offer item to borrowing post id = " + PostId
 	errLog := util.CallActivityLogService(uint64(request.LendingUserID), logDetail)
 	if errLog != nil {
