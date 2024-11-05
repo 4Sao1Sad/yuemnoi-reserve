@@ -1,9 +1,11 @@
 module github.com/KKhimmoon/yuemnoi-reserve
 
-go 1.23.0
+go 1.22
+
+toolchain go1.22.1
 
 require (
-	github.com/gofiber/fiber/v3 v3.0.0-beta.3
+	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/spf13/viper v1.19.0
 	google.golang.org/grpc v1.67.1
@@ -15,8 +17,6 @@ require (
 require (
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/gofiber/fiber/v2 v2.52.5 // indirect
-	github.com/gofiber/utils/v2 v2.0.0-beta.7 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

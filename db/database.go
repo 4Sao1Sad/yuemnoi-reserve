@@ -53,7 +53,7 @@ func ServerInit(cfg *config.Config, db *gorm.DB) error {
 
 	// Start the server with error handling
 	port := strconv.Itoa(int(cfg.Port))
-	if err := app.Listen(cfg.Host + ":" + port); err != nil {
+	if err := app.Listen(":" + port); err != nil {
 		log.Fatalf("failed to start server: %v", err)
 		return err
 	}

@@ -49,19 +49,19 @@ func (h *BorrowingRequestRestHandler) CreateBorrowingRequest(c *fiber.Ctx) error
 	}
 	if err := util.ValidatePostExists(nil, uint64(borrowingRequest.PostID)); err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Post don't exist",
+			"error": "Post doesn't exist",
 		})
 	}
 	_, err = util.GetUserById(uint(borrowingRequest.BorrowingUserID))
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "User don't exist",
+			"error": "User doesn't exist",
 		})
 	}
 	_, err = util.GetUserById(uint(borrowingRequest.LendingUserID))
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "User don't exist",
+			"error": "User doesn't exist",
 		})
 	}
 	if err := util.CheckPostIsReady(nil, uint64(borrowingRequest.PostID)); err != nil {

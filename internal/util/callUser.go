@@ -3,7 +3,9 @@ package util
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/KKhimmoon/yuemnoi-reserve/config"
 )
@@ -11,10 +13,24 @@ import (
 func GetUserById(userId uint) (string, error) {
 	cfg := config.Load()
 	url := fmt.Sprintf("%s%d", cfg.UserInfoURL, userId)
-	resp, err := http.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return "", fmt.Errorf("failed to call user service: %v", err)
+		log.Print(err)
+		return "", err
 	}
+
+	// Set the header
+	req.Header.Set("X-User-Id", strconv.Itoa(int(userId)))
+	req.Header.Set("X-bypass-auth", "true")
+
+	// Send the request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Print(err)
+		return "", err
+	}
+	defer resp.Body.Close()
 
 	switch resp.StatusCode {
 	case http.StatusOK:

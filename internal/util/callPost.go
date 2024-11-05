@@ -104,6 +104,7 @@ func getLendingPost(conn *grpc.ClientConn, postId uint64) (*postpb.LendingPost, 
 	client := postpb.NewLendingPostServiceClient(conn)
 	req := &postpb.GetLendingPostDetailRequest{Id: postId}
 	res, err := client.GetLendingPostDetail(context.Background(), req)
+	fmt.Println(res, err)
 	if err != nil {
 		return nil, fmt.Errorf("lending post id not found: %v", err)
 	}
@@ -113,10 +114,12 @@ func getLendingPost(conn *grpc.ClientConn, postId uint64) (*postpb.LendingPost, 
 func ValidatePostExists(borrowingPostId *uint64, lendingPostId uint64) error {
 	if borrowingPostId != nil {
 		if _, err := GetPost("BorrowingPost", *borrowingPostId); err != nil {
+			log.Print("borrowing post with Id does not exist", err)
 			return fmt.Errorf("borrowing post with Id %d does not exist", *borrowingPostId)
 		}
 	}
 	if _, err := GetPost("LendingPost", lendingPostId); err != nil {
+		log.Print("lending post with Id does not exist", err)
 		return fmt.Errorf("lending post with Id %d does not exist", lendingPostId)
 	}
 	return nil
