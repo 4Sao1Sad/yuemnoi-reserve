@@ -33,6 +33,7 @@ func (h *Handler) RegisterRouter(r fiber.Router, cfg *config.Config) {
 	{
 		lendingRequestRouter := r.Group("/lending-requests")
 		lendingRequestRouter.Get("/my-requests", h.lendingRequestRestHandler.GetMyLendingRequests)
+		lendingRequestRouter.Get("/my-requests/:postId", h.lendingRequestRestHandler.GetMyLendingRequestsFromSpecificBorrowingPostId)
 		lendingRequestRouter.Get("/my-borrowing-posts", h.lendingRequestRestHandler.GetMyBorrowingPosts)
 		lendingRequestRouter.Post("/accept/:requestId", h.lendingRequestRestHandler.AcceptLendingRequest)
 		lendingRequestRouter.Post("/reject/:requestId", h.lendingRequestRestHandler.RejectLendingRequest)

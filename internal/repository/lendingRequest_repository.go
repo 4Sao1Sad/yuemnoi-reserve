@@ -25,6 +25,7 @@ type LendingRequestRepository interface {
 	ReturnItemLendingRequest(request model.LendingRequest) (model.LendingRequest, error)
 	GetMyActiveLendingRequests(userId uint) ([]model.LendingRequest, error)
 	GetMyHistorryLendingRequests(userId uint) ([]model.LendingRequest, error)
+	GetMyLendingRequestsFromSpecificBorrowingPostId(userId uint, postId uint) ([]model.LendingRequest, error)
 }
 
 func (r LendingRequestRepositoryImpl) GetMyLendingRequests(userId uint) ([]model.LendingRequest, error) {
@@ -96,6 +97,14 @@ func (r LendingRequestRepositoryImpl) GetMyHistorryLendingRequests(userId uint) 
 	var requests []model.LendingRequest
 	if err := r.db.Where("(lending_user_id = ? OR borrowing_user_id = ?) AND active_status = ?",
 		userId, userId, false).Find(&requests).Order("updated_at DESC").Error; err != nil {
+		return nil, err
+	}
+	return requests, nil
+}
+
+func (r LendingRequestRepositoryImpl) GetMyLendingRequestsFromSpecificBorrowingPostId(userId uint, postId uint) ([]model.LendingRequest, error) {
+	var requests []model.LendingRequest
+	if err := r.db.Where("borrowing_user_id = ? AND borrowing_post_id = ?", userId, postId).Find(&requests).Error; err != nil {
 		return nil, err
 	}
 	return requests, nil

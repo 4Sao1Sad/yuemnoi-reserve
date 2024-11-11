@@ -141,19 +141,31 @@ func (h *LendingRequestRestHandler) GetMyLendingRequests(c *fiber.Ctx) error {
 			"error": "Unable to retrieve borrowing posts",
 		})
 	}
+	lendingPostMap := make(map[uint64]interface{})
+	for _, post := range lendingPosts.Posts {
+		lendingPostMap[post.Id] = post
+	}
+	borrowingPostMap := make(map[uint64]interface{})
+	for _, post := range borrowingPosts.BorrowingPost {
+		borrowingPostMap[post.Id] = post
+	}
 	var response []dto.GetMyLendingRequestsResponse
-	for i, request := range requests {
-		response = append(response, dto.GetMyLendingRequestsResponse{
-			ID:              request.ID,
-			BorrowingUserID: request.BorrowingUserID,
-			LendingUserID:   request.LendingUserID,
-			BorrowingPostID: request.BorrowingPostID,
-			LendingPostID:   request.LendingPostID,
-			Status:          request.Status,
-			ActiveStatus:    request.ActiveStatus,
-			LendingPost:     lendingPosts.Posts[i],
-			BorrowingPost:   borrowingPosts.BorrowingPost[i],
-		})
+	for _, request := range requests {
+		lendingPost, foundLending := lendingPostMap[uint64(request.LendingPostID)]
+		borrowingPost, foundBorrowing := borrowingPostMap[uint64(request.BorrowingPostID)]
+		if foundLending && foundBorrowing {
+			response = append(response, dto.GetMyLendingRequestsResponse{
+				ID:              request.ID,
+				BorrowingUserID: request.BorrowingUserID,
+				LendingUserID:   request.LendingUserID,
+				BorrowingPostID: request.BorrowingPostID,
+				LendingPostID:   request.LendingPostID,
+				Status:          request.Status,
+				ActiveStatus:    request.ActiveStatus,
+				LendingPost:     lendingPost,
+				BorrowingPost:   borrowingPost,
+			})
+		}
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
@@ -161,6 +173,63 @@ func (h *LendingRequestRestHandler) GetMyLendingRequests(c *fiber.Ctx) error {
 	})
 }
 
+func (h *LendingRequestRestHandler) GetMyLendingRequestsFromSpecificBorrowingPostId(c *fiber.Ctx) error {
+	userIdString := c.Get("X-User-Id")
+	if userIdString == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "User not authenticated",
+		})
+	}
+	userId, err := strconv.Atoi(userIdString)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid userId",
+		})
+	}
+	postIdStr := c.Params("postId")
+	postId, err := strconv.Atoi(postIdStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid post ID format",
+		})
+	}
+
+	requests, err := h.lendingRequestRepository.GetMyLendingRequestsFromSpecificBorrowingPostId(uint(userId), uint(postId))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Unable to retrieve Lending requests",
+		})
+	}
+	var lendingPostids []uint64
+	for _, request := range requests {
+		lendingPostids = append(lendingPostids, uint64(request.LendingPostID))
+	}
+
+	lendingPosts, err := util.GetLendingPostsByIds(lendingPostids)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Unable to retrieve lending posts",
+		})
+	}
+	lendingPostMap := make(map[uint64]interface{})
+	for _, post := range lendingPosts.Posts {
+		lendingPostMap[post.Id] = post
+	}
+	var response []dto.GetMyLendingRequestsFromSpecificBorrowingPostIdResponse
+	for _, request := range requests {
+		lendingPost, found := lendingPostMap[uint64(request.LendingPostID)]
+		if !found {
+			continue
+		}
+		response = append(response, dto.GetMyLendingRequestsFromSpecificBorrowingPostIdResponse{
+			ID:          request.ID,
+			LendingPost: lendingPost,
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data": response,
+	})
+}
 func (h *LendingRequestRestHandler) GetMyBorrowingPosts(c *fiber.Ctx) error {
 	userIdString := c.Get("X-User-Id")
 	if userIdString == "" {
@@ -203,19 +272,31 @@ func (h *LendingRequestRestHandler) GetMyBorrowingPosts(c *fiber.Ctx) error {
 			"error": "Unable to retrieve lending posts",
 		})
 	}
+	lendingPostMap := make(map[uint64]interface{})
+	for _, post := range lendingPosts.Posts {
+		lendingPostMap[post.Id] = post
+	}
+	borrowingPostMap := make(map[uint64]interface{})
+	for _, post := range borrowingPosts.BorrowingPost {
+		borrowingPostMap[post.Id] = post
+	}
 	var response []dto.GetMyBorrowingPostsResponse
-	for i, request := range requests {
-		response = append(response, dto.GetMyBorrowingPostsResponse{
-			ID:              request.ID,
-			BorrowingUserID: request.BorrowingUserID,
-			LendingUserID:   request.LendingUserID,
-			BorrowingPostID: request.BorrowingPostID,
-			LendingPostID:   request.LendingPostID,
-			Status:          request.Status,
-			ActiveStatus:    request.ActiveStatus,
-			LendingPost:     lendingPosts.Posts[i],
-			BorrowingPost:   borrowingPosts.BorrowingPost[i],
-		})
+	for _, request := range requests {
+		lendingPost, foundLending := lendingPostMap[uint64(request.LendingPostID)]
+		borrowingPost, foundBorrowing := borrowingPostMap[uint64(request.BorrowingPostID)]
+		if foundLending && foundBorrowing {
+			response = append(response, dto.GetMyBorrowingPostsResponse{
+				ID:              request.ID,
+				BorrowingUserID: request.BorrowingUserID,
+				LendingUserID:   request.LendingUserID,
+				BorrowingPostID: request.BorrowingPostID,
+				LendingPostID:   request.LendingPostID,
+				Status:          request.Status,
+				ActiveStatus:    request.ActiveStatus,
+				LendingPost:     lendingPost,
+				BorrowingPost:   borrowingPost,
+			})
+		}
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"data": response,

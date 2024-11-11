@@ -1,6 +1,8 @@
 package dto
 
-import "github.com/KKhimmoon/yuemnoi-reserve/internal/model"
+import (
+	"github.com/KKhimmoon/yuemnoi-reserve/internal/model"
+)
 
 type GetMyLendingRequestsResponse struct {
 	ID              uint                `json:"id"`
@@ -29,4 +31,9 @@ type CreateLendingRequestInput struct {
 	BorrowingUserID uint `json:"borrowing_user_id"`
 	BorrowingPostID uint `json:"borrowing_post_id"`
 	LendingPostID   uint `json:"lending_post_id"`
+}
+
+type GetMyLendingRequestsFromSpecificBorrowingPostIdResponse struct {
+	ID          uint        `json:"id"`
+	LendingPost interface{} `json:"lending_post"`
 }

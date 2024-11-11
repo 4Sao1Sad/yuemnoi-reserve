@@ -125,8 +125,16 @@ func (h *BorrowingRequestRestHandler) GetMyBorrowingRequests(c *fiber.Ctx) error
 			"error": "Unable to retrieve lending posts",
 		})
 	}
+	lendingPostMap := make(map[uint64]interface{})
+	for _, post := range lendingPosts.Posts {
+		lendingPostMap[post.Id] = post
+	}
 	var response []dto.GetMyBorrowingRequestsResponse
-	for i, request := range requests {
+	for _, request := range requests {
+		post, found := lendingPostMap[uint64(request.PostID)]
+		if !found {
+			continue
+		}
 		response = append(response, dto.GetMyBorrowingRequestsResponse{
 			ID:              request.ID,
 			BorrowingUserID: request.BorrowingUserID,
@@ -134,7 +142,7 @@ func (h *BorrowingRequestRestHandler) GetMyBorrowingRequests(c *fiber.Ctx) error
 			PostID:          request.PostID,
 			Status:          request.Status,
 			ActiveStatus:    request.ActiveStatus,
-			Post:            lendingPosts.Posts[i],
+			Post:            post,
 		})
 	}
 
@@ -176,13 +184,21 @@ func (h *BorrowingRequestRestHandler) GetMyLendingPosts(c *fiber.Ctx) error {
 			"error": "Unable to retrieve lending posts",
 		})
 	}
+	lendingPostMap := make(map[uint64]interface{})
+	for _, post := range lendingPosts.Posts {
+		lendingPostMap[post.Id] = post
+	}
 	var response []dto.GetMyLendingPostsResponse
-	for i, request := range requests {
+	for _, request := range requests {
 		name, err := util.GetUserById(uint(userId))
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Unable retrieve user name",
 			})
+		}
+		lendingPost, found := lendingPostMap[uint64(request.PostID)]
+		if !found {
+			continue
 		}
 		response = append(response, dto.GetMyLendingPostsResponse{
 			ID:              request.ID,
@@ -191,7 +207,7 @@ func (h *BorrowingRequestRestHandler) GetMyLendingPosts(c *fiber.Ctx) error {
 			PostID:          request.PostID,
 			Status:          request.Status,
 			ActiveStatus:    request.ActiveStatus,
-			Post:            lendingPosts.Posts[i],
+			Post:            lendingPost,
 			Borrower:        name,
 		})
 	}
