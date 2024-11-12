@@ -190,7 +190,7 @@ func (h *BorrowingRequestRestHandler) GetMyLendingPosts(c *fiber.Ctx) error {
 	}
 	var response []dto.GetMyLendingPostsResponse
 	for _, request := range requests {
-		name, err := util.GetUserById(uint(userId))
+		name, err := util.GetUserById(uint(request.BorrowingUserID))
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Unable retrieve user name",
